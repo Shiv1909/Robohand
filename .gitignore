@@ -1,3 +1,8 @@
+# Firmware mirrored back into the project for the Wokwi VS Code extension,
+# which rejects any firmware path outside the workspace. Regenerated on every
+# build by scripts/copy_firmware_for_wokwi.py.
+.wokwi/
+
 # PlatformIO build workspace.
 # Redirected out of this folder via workspace_dir in platformio.ini (OneDrive),
 # but ignore it anyway in case that redirect is ever removed.

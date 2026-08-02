@@ -30,12 +30,18 @@
 # through a different path and may work where the CLI does not.
 # ---------------------------------------------------------------------------
 #
-# NOTE: absolute paths are deliberate. platformio.ini redirects the build
-# workspace out of this OneDrive-synced folder to %LOCALAPPDATA%, so there is no
-# sane relative path from here to the firmware. On another machine, update these
-# two lines (or drop the workspace_dir redirect).
+# Paths MUST stay inside this folder. The VS Code extension rejects anything
+# outside the workspace ("firmware binary ... not found in workspace"), so an
+# absolute path into the real build workspace does not work — even though that
+# workspace deliberately lives outside this OneDrive-synced folder.
+#
+# scripts/copy_firmware_for_wokwi.py mirrors the artifacts into .wokwi/<env>/
+# after every build, so these stay current automatically. .wokwi/ is gitignored.
+#
+# To simulate Phase 1 instead, swap both `phase1b_button` below for
+# `phase1_autopress` (build it once first so the mirror exists).
 
 [wokwi]
 version = 1
-firmware = 'C:/Users/ShivanshMital/AppData/Local/pio-workspace/fingerbot/build/phase1b_button/firmware.bin'
-elf = 'C:/Users/ShivanshMital/AppData/Local/pio-workspace/fingerbot/build/phase1b_button/firmware.elf'
+firmware = '.wokwi/phase1b_button/firmware.bin'
+elf = '.wokwi/phase1b_button/firmware.elf'
