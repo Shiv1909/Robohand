@@ -76,6 +76,7 @@ independently flashable:
 | ------------------ | ------------------------ | ------------------------------- |
 | `phase1_autopress` | `phase1_autopress.cpp`   | Presses every 3s. No inputs.    |
 | `phase1b_button`   | `phase1b_button.cpp`     | Presses on a debounced button.  |
+| `native`           | `test/test_debounce/`    | Debounce unit tests, on the PC. |
 
 ```
 pio run -e phase1_autopress -t upload
@@ -84,6 +85,29 @@ pio run -e phase1b_button   -t upload
 
 Always pass `-e`. A bare `pio run` builds only `default_envs` (`phase1_autopress`),
 not both — so it will silently skip Phase 1b and look like it succeeded.
+
+## Tests
+
+```
+pio test -e native
+```
+
+Eight Unity tests over `include/debounce.h`, running on the PC — no ESP32, no
+servo, no wiring. Debounce is the only nontrivial algorithm in Phase 1b and the
+one most annoying to diagnose on real hardware, so it's pinned down here with a
+synthetic clock instead: clean press, bouncing contacts, held button, release,
+double press, sub-window glitch, and `millis()` rollover at ~49 days.
+
+The suite is verified non-vacuous — deleting the debounce window from
+`Debouncer::update()` makes the glitch and bounce tests fail.
+
+This is why the debounce logic sits in `include/debounce.h` rather than inline in
+`phase1b_button.cpp`: it's free of `digitalRead()`/`millis()` so it compiles for
+the host. `phase1b_button.cpp` just converts the active-low pin into a bool and
+supplies `millis()`.
+
+**Tests prove the logic, not the machine.** A green run says nothing about servo
+torque, brownout, or wiring — those need hardware.
 
 `phase1_autopress` is the default env and **the known-good baseline** — keep it
 working. When a later phase misbehaves, flash it to prove the servo, wiring, and

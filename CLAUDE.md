@@ -46,6 +46,35 @@ Baseline compile results (2026-08-02, both clean): `phase1_autopress` 21.5% flas
 6.6% RAM; `phase1b_button` similar. A first build on a clean machine pulls the ESP32
 toolchain (several hundred MB) and takes minutes.
 
+## Testing
+
+```
+pio test -e native
+```
+
+Runs on the host PC, needs a native `g++` — MinGW-w64 (WinLibs UCRT, GCC 16.1.0)
+is installed at
+`%LOCALAPPDATA%\Microsoft\WinGet\Packages\BrechtSanders.WinLibs.POSIX.UCRT_*\mingw64\bin`
+and is on the User PATH. Visual Studio 18 is present on this machine but has no
+C++ workload, so MSVC is not an option.
+
+`[env:native]` sets `build_src_filter = -<*>` because everything in `src/` is
+Arduino-only and will not compile for the host. Tests exercise
+`include/debounce.h`, which is deliberately Arduino-free.
+
+Note the config uses `[esp32_base]` + `extends` rather than a shared `[env]`
+section. `[env]` applies to *every* environment, which would force
+`board = esp32dev` onto the native env and break it.
+
+## Git
+
+Remote: https://github.com/Shiv1909/Robohand (**public** — no credentials in
+source). `include/secrets.h` is gitignored for the Phase 3 WiFi details.
+
+Work on `main` until hardware arrives. Once a phase is validated on the real
+board, tag it (`git tag phase1-validated`) so there's a known-physically-working
+commit to fall back to while chasing gremlins.
+
 ## If PlatformIO ever needs reinstalling
 
 Do **not** run `python get-platformio.py`. On this machine bare `python` resolves to
