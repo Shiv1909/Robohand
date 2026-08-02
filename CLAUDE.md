@@ -66,6 +66,31 @@ Note the config uses `[esp32_base]` + `extends` rather than a shared `[env]`
 section. `[env]` applies to *every* environment, which would force
 `board = esp32dev` onto the native env and break it.
 
+## Simulation (Wokwi)
+
+`wokwi-cli` 0.26.1 is installed at
+`%LOCALAPPDATA%\Programs\wokwi-cli\wokwi-cli.exe` and is on the User PATH. It was
+installed by downloading the release binary from GitHub rather than the documented
+`iwr https://wokwi.com/ci/install.ps1 | iex`, because piping a remote script into
+`iex` is blocked here.
+
+Needs `WOKWI_CLI_TOKEN`. **Never commit the token — this repo is public.** It
+lives in the User environment; regenerate at https://wokwi.com/dashboard/ci.
+
+ESP32 simulation does not currently work (no serial, chip never executes) while
+AVR does. Full elimination trail is in the comment block in `wokwi.toml`. Don't
+re-derive it from scratch — start from the VS Code extension instead.
+
+Useful while debugging a diagram:
+
+```
+wokwi-cli lint .
+wokwi-cli . --timeout 10000 --serial-log-file serial.log
+```
+
+Note the built-in linter flags every ESP32 board as an "undocumented type" — that
+is noise, every ESP32 entry in its registry has `documented: false`.
+
 ## Git
 
 Remote: https://github.com/Shiv1909/Robohand (**public** — no credentials in

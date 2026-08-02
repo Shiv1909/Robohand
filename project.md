@@ -109,6 +109,28 @@ supplies `millis()`.
 **Tests prove the logic, not the machine.** A green run says nothing about servo
 torque, brownout, or wiring — those need hardware.
 
+## Simulation (Wokwi) — set up, but BLOCKED
+
+```
+pio run -e phase1b_button
+wokwi-cli . --scenario test/wokwi/phase1b_button.scenario.yaml --timeout 30000
+```
+
+`diagram.json` models the ESP32 + servo + pushbutton and passes `wokwi-cli lint`.
+The button has bounce enabled, so the simulated firmware would face genuinely
+dirty edges — a real integration test of the debouncer, covering what the unit
+tests can't (ESP32Servo timer allocation, `attach()`, the GPIO pull-up).
+
+**It does not run.** ESP32 simulations produce no serial and never execute. The
+cause is outside this repo — full elimination trail is in `wokwi.toml`, but in
+short: the token is valid, an AVR sketch simulates correctly with the same CLI
+and token, and a bare `Serial.println` ESP32 sketch is equally silent. Flash
+format, board type, and timeout were all ruled out.
+
+Next thing to try is the Wokwi **VS Code extension**, which drives the simulator
+over a different path. Until something here actually passes, treat this as
+unproven — the setup can currently only fail, never pass.
+
 `phase1_autopress` is the default env and **the known-good baseline** — keep it
 working. When a later phase misbehaves, flash it to prove the servo, wiring, and
 power are still fine before debugging anything else. The two files duplicate their
@@ -159,8 +181,12 @@ in week-old code.
 
 - Build ONE switch end-to-end before scaling to the multi-gang board.
 
-- The Wokwi MCP server is NOT needed here — it runs pre-compiled firmware for CI
-  testing. PlatformIO gives the real hardware loop, which is what we want now.
+- **Wokwi CLI cannot currently simulate ESP32** on this setup — see "Simulation"
+  above. AVR simulates fine with the same CLI and token, so the tooling and
+  account are good; it's ESP32-specific. (This supersedes the older note here
+  that Wokwi "isn't needed" — that was written assuming hardware was days away.
+  With hardware delayed, simulating the real compiled binary is worth having;
+  it just doesn't work yet.)
 
 ## Next actions
 

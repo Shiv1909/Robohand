@@ -1,0 +1,41 @@
+# Wokwi simulation config — runs the REAL compiled firmware against a simulated
+# ESP32, servo, and pushbutton.
+#
+#     pio run -e phase1b_button
+#     wokwi-cli . --scenario test/wokwi/phase1b_button.scenario.yaml --timeout 30000
+#
+# To simulate Phase 1 instead, point both paths at build/phase1_autopress/.
+#
+# ---------------------------------------------------------------------------
+# STATUS 2026-08-02: NOT WORKING via wokwi-cli. Do not trust a green run here
+# until this is resolved — right now it can only fail, never pass.
+#
+# ESP32 simulations produce zero serial output and never execute. Established
+# by elimination, so the cause is NOT in this repo:
+#   - Token is valid      (a bogus token fails fast with "Unauthorized";
+#                          this one reaches "Starting simulation...")
+#   - AVR works fine      (an Arduino Uno + Serial.println sketch simulates and
+#                          streams serial correctly with the same CLI + token)
+#   - Not our firmware    (a bare `Serial.println("HELLO")` ESP32 sketch is
+#                          equally silent)
+#   - Not the diagram     (passes `wokwi-cli lint`)
+#   - Not the flash format (tried firmware.bin, an esptool merge_bin image, and
+#                          a synthesized ESP-IDF flasher_args.json)
+#   - Not board choice    (board-esp32-devkit-c-v4 and wokwi-esp32-devkit-v1)
+#   - Not a slow boot     (70s wall clock, still nothing; no VCD output either,
+#                          so the chip is not executing at all)
+#
+# So this is an ESP32-side problem in wokwi-cli 0.26.1 / the Wokwi CI API.
+# Next thing to try: the Wokwi VS Code extension, which drives the simulator
+# through a different path and may work where the CLI does not.
+# ---------------------------------------------------------------------------
+#
+# NOTE: absolute paths are deliberate. platformio.ini redirects the build
+# workspace out of this OneDrive-synced folder to %LOCALAPPDATA%, so there is no
+# sane relative path from here to the firmware. On another machine, update these
+# two lines (or drop the workspace_dir redirect).
+
+[wokwi]
+version = 1
+firmware = 'C:/Users/ShivanshMital/AppData/Local/pio-workspace/fingerbot/build/phase1b_button/firmware.bin'
+elf = 'C:/Users/ShivanshMital/AppData/Local/pio-workspace/fingerbot/build/phase1b_button/firmware.elf'

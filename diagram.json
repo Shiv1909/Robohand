@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "author": "Shiv1909",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "board-esp32-devkit-c-v4",
+      "id": "esp",
+      "top": 0,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-servo",
+      "id": "servo1",
+      "top": -120,
+      "left": 250,
+      "attrs": { "horn": "single" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn1",
+      "top": 150,
+      "left": 250,
+      "attrs": { "color": "green", "bounce": "1" }
+    }
+  ],
+  "connections": [
+    [ "esp:18", "servo1:PWM", "orange", [] ],
+    [ "esp:5V", "servo1:V+", "red", [] ],
+    [ "esp:GND.1", "servo1:GND", "black", [] ],
+
+    [ "esp:4", "btn1:1.l", "green", [] ],
+    [ "esp:GND.2", "btn1:2.l", "black", [] ]
+  ],
+  "dependencies": {}
+}

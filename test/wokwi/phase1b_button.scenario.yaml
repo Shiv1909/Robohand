@@ -1,0 +1,44 @@
+# Automated Wokwi scenario for Phase 1b.
+#
+# Drives the real compiled firmware in a simulated circuit and asserts on the
+# serial output. This is the closest thing to a hardware test that runs with no
+# hardware — it exercises the whole path the unit tests can't reach:
+# ESP32Servo timer allocation, attach(), the GPIO pull-up, and the debouncer
+# wired to a genuinely bouncing button (btn1 has bounce enabled in diagram.json).
+#
+# Run:
+#     pio run -e phase1b_button
+#     wokwi-cli . --scenario test/wokwi/phase1b_button.scenario.yaml --timeout 20000
+#
+# What this canNOT prove: servo torque, current draw, or the brownout. Those are
+# physical and the simulator models none of them.
+
+name: Phase 1b — debounced button fires one press
+version: 1
+author: Shiv1909
+
+steps:
+  # 1. Firmware booted and got past ESP32Servo setup without hanging.
+  - wait-serial: "Fingerbot Phase 1b ready"
+
+  # 2. Idle. Nothing should move on its own — this is what separates 1b from
+  #    Phase 1, where the arm would already be pressing every 3 seconds.
+  - delay: 2s
+
+  # 3. Push the button. Wokwi simulates contact bounce on this part, so the
+  #    firmware sees a genuinely dirty edge here, not a clean one.
+  - set-control:
+      part-id: btn1
+      control: pressed
+      value: 1
+
+  # 4. The press sequence must follow, in order.
+  - wait-serial: ">> Pressing"
+  - wait-serial: ">> Releasing"
+  - wait-serial: ">> Done."
+
+  # 5. Release.
+  - set-control:
+      part-id: btn1
+      control: pressed
+      value: 0
