@@ -1,0 +1,17 @@
+# PlatformIO build workspace.
+# Redirected out of this folder via workspace_dir in platformio.ini (OneDrive),
+# but ignore it anyway in case that redirect is ever removed.
+.pio/
+
+# PlatformIO / VS Code local settings
+.vscode/
+!.vscode/extensions.json
+
+# OneDrive / Windows cruft
+desktop.ini
+Thumbs.db
+
+# Credentials. THIS REPO IS PUBLIC. Phase 3 (HomeSpan) needs a WiFi SSID and
+# password — put them in include/secrets.h and they'll stay out of git.
+# Never hardcode them into a src/*.cpp file.
+include/secrets.h
