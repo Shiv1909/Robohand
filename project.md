@@ -127,9 +127,21 @@ short: the token is valid, an AVR sketch simulates correctly with the same CLI
 and token, and a bare `Serial.println` ESP32 sketch is equally silent. Flash
 format, board type, and timeout were all ruled out.
 
-Next thing to try is the Wokwi **VS Code extension**, which drives the simulator
-over a different path. Until something here actually passes, treat this as
-unproven — the setup can currently only fail, never pass.
+**The VS Code extension fails the same way** (2026-08-02): simulator starts, the
+servo never moves, serial stays empty. So this is not a wokwi-cli bug — both
+front ends hit it, and the common factor is ESP32 itself.
+
+**AVR works, ESP32 does not.** This is almost certainly why Phase 0 was proven on
+an Arduino Uno rather than an ESP32 — the same wall, hit earlier. Worth
+remembering before anyone sinks time into "simulate it first" again.
+
+The decisive test not yet run: open an ESP32 project on wokwi.com in a browser.
+Wokwi compiles server-side there, so it bypasses this machine's firmware
+entirely. If that works, the problem is local; if it fails too, ESP32 simulation
+simply isn't available here and the answer is to stop trying and wait for
+hardware.
+
+Treat this as unproven — the setup can currently only fail, never pass.
 
 `phase1_autopress` is the default env and **the known-good baseline** — keep it
 working. When a later phase misbehaves, flash it to prove the servo, wiring, and
