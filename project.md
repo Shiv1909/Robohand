@@ -16,6 +16,9 @@ subscription.
 
 ## Hardware
 
+Full shopping list with specs, reasoning, and what NOT to buy: **[BOM.md](BOM.md)**.
+That file also lists the switch measurements needed before Phase 4.
+
 - **ESP32 dev board** (WiFi + BLE — needed for the Siri/HomeKit step)
 - **MG90S servo** (metal-gear; wall switches need a firm push and metal gears last)
 - **Separate 5V supply for the servo** (see SERVO BROWNOUT below — not optional)
