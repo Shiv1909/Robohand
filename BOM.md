@@ -127,12 +127,56 @@ made, and buying now means buying twice.
   need.
 - **Mounting adhesive** — 3M VHB tape or Command strips. Depends on the housing
   size, which depends on the measurements below.
-- **Battery + charging (Phase 5)** — 18650 + TP4056 + boost converter, *or* just
-  a USB wall adapter. Genuinely undecided: a servo stalling against a switch is
-  power-hungry, and permanent USB power may beat battery swaps. Decide after
-  Phase 4.
+- **Battery + charging (Phase 5)** — **probably don't. Use mains USB.** See
+  "Can we run it on cells?" below; the arithmetic is not close.
 - **Servos 2..N** — one per additional switch. Order after one switch works
   end-to-end through Siri.
+
+---
+
+## Can we run it on cells?
+
+Short answer: fine for bench testing, bad for the permanent install — and not for
+the reason you'd expect.
+
+### On the bench (Phase 1/1b) — works
+
+Use **4 × AA NiMH** (Eneloop-type), *not* alkaline:
+
+| | NiMH ×4 | Alkaline ×4 |
+| --- | --- | --- |
+| Pack voltage | 4.8 V (in the MG90S 4.8–6.0 V range) | 6.0 V nominal, ~6.4 V fresh |
+| Internal resistance | ~20–50 mΩ/cell | ~150–300 mΩ/cell, rising as they drain |
+| Sag at 750 mA stall | small | **0.5–1 V** |
+
+Alkalines look better on the voltage spec and are the wrong answer. Their internal
+resistance recreates the exact brownout the separate supply exists to prevent, and
+it worsens as the cells age.
+
+Even so, prefer the wall adapter during bring-up: a pack whose voltage droops as
+it discharges is a moving variable, and Phase 1 is precisely when you want the
+power supply to be the one thing that isn't a suspect.
+
+### Permanently (Phase 5) — no
+
+**The servo is not the power problem. The always-on WiFi is.**
+
+| Load | Draw | Per day |
+| --- | --- | --- |
+| Servo presses (10/day, ~1 s each) | 750 mA peak | **~2 mAh** |
+| ESP32 idle, WiFi connected | ~80 mA continuous | **~1900 mAh** |
+
+The servo is roughly 0.1 % of the energy budget. On 4 × AA NiMH (2000 mAh) that's
+**about one day** per charge. Aggressive modem-sleep/DTIM tuning might average
+~25 mA and reach ~3 days — still a device you service twice a week.
+
+Deep sleep is not an escape: HomeKit requires the accessory to stay reachable, so
+the radio has to stay up.
+
+**Conclusion: run the permanent install from mains USB.** A phone charger and a
+cable to the switchboard beats a battery that dies every few days. If a wire to
+the board is genuinely unacceptable, that's a reason to reconsider the whole
+approach (e.g. a BLE/Thread accessory that can sleep), not to add batteries.
 
 ---
 
