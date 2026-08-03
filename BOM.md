@@ -1,11 +1,11 @@
 # Bill of Materials — DIY Fingerbot
 
-Shopping list and build inventory. Tick items as they arrive.
+Shopping list and build inventory for a build in **India**. Tick items as they arrive.
 
-**About the links:** these are *search* links, not specific product pages. Listings
-go dead and stock changes, and a specific item I can't verify is worse than a
-search that always shows what's actually available. Match the **spec**, not a
-particular seller. Swap the domain for your region.
+> **Prices are estimates (₹, Aug 2026) and shipping is extra.** Only the capacitor
+> price below was confirmed on the vendor page; the rest are typical current
+> street prices for these exact parts. Verify at checkout — treat the totals as a
+> budget, not a quote.
 
 ---
 
@@ -23,139 +23,121 @@ Per `project.md`. Don't re-order.
 
 ## A. Order now — these block Phase 1
 
-Phase 1 is not safe to run without A1–A3. Everything else can wait.
+| # | Item | Spec | Qty | Link | ₹ |
+| --- | --- | --- | --- | --- | --- |
+| A1 | 5 V power adapter | 5 V **3 A**, regulated, 5.5×2.1 mm plug | 1 | [Robu — Orange 5V 3A](https://robu.in/product/orange-5v-3a-power-supply-adapter-charger-with-5-5mm-dc-plug/) | 350 |
+| A2 | Barrel → screw terminal | Female 5.5×2.1 mm to screw terminal | 1 | [Sunrom #5908](https://www.sunrom.com/p/female-dc-power-adapter-55x21mm-plug-to-screw-terminal) | 30 |
+| A3 | Bulk capacitor | **1000 µF 16 V, leaded** (not SMD) | 3 | [Sunrom — Samwha 10 mm](https://www.sunrom.com/p/1000uf-16v-10mm-samwha) | 34 |
+| A4 | Ceramic capacitor | 0.1 µF / 104, through-hole | 5-pk | [ElectronicsComp — 0.1 µF 104](https://www.electronicscomp.com/0.1uf-104-ceramic-capacitor) | 10 |
+| A5 | Tactile pushbuttons | 6×6×5 mm, 4-pin, breadboard pitch | 20-pk | [Robu — pack of 20](https://robu.in/product/6x6x5mm-tactile-push-button-switch-pack-of-20/) | 75 |
 
-### A1. 5 V DC regulated power supply — 3 A
+**Subtotal A: ₹499**
 
-- [ ] **Spec:** 5 V DC output, **≥ 2 A, 3 A recommended**. Regulated, not a raw
-      "unregulated wall wart". Barrel plug **5.5 × 2.1 mm centre-positive** is the
-      most common and matches A2.
-- **Why 3 A when the servo needs less:** the MG90S datasheet lists stall current
-  at **750 mA ±10 % @ 6 V**, but startup inrush spikes well above the steady
-  figure, and the endgame is several servos on one switchboard. 3 A covers about
-  three servos with headroom. A 2 A unit is fine for one servo today.
-- **Why 5 V and not 6 V:** the MG90S is rated 4.8–6.0 V. 6 V gives slightly more
-  torque (2.0 vs ~1.8 kg·cm) but 5 V is the safer, more available option and
-  keeps everything on one rail voltage.
-- 🔗 [Amazon search](https://www.amazon.com/s?k=5V+3A+regulated+power+supply+5.5x2.1mm+barrel)
-  · [Robu.in](https://robu.in/?s=5v+3a+power+adapter)
-  · [Adafruit](https://www.adafruit.com/?q=5V+3A+power+supply)
+### Why these, specifically
 
-> **Do NOT substitute an MB102 breadboard power module.** They're the obvious-looking
-> choice and they will not work here — they source only a few hundred mA and brown
-> out exactly when the servo stalls, which is the precise failure you're trying to
-> engineer out.
+- **A1 — 3 A, not 2 A.** The MG90S datasheet lists stall at **750 mA ±10 % @ 6 V**,
+  so 2 A would cover one servo. But inrush spikes above steady stall, and the plan
+  scales to several servos on one switchboard. 3 A covers ~three with headroom.
+  5 V (not 6 V) keeps everything on one rail and stays safely inside the servo's
+  4.8–6.0 V range.
+- **A3 — buy 3, and make sure they're LEADED.** Most search hits for this part are
+  SMD, which you cannot use on a breadboard. The linked Samwha is a radial
+  through-hole part. Fit it **across the servo's V+ and GND, close to the servo** —
+  at the far end of a long wire it does much less good. **Polarity matters:** the
+  stripe is negative; backwards, it can vent.
+- **A4 — sits in parallel with A3.** The electrolytic is slow and handles bulk sag;
+  this one handles high-frequency noise it can't. Standard practice, costs nothing.
+- **A5 — no resistor needed.** The ESP32's internal pull-up handles it
+  (`phase1b_button` uses GPIO 4).
 
-### A2. Barrel jack → screw terminal adapter
-
-- [ ] **Spec:** female DC barrel jack, **5.5 × 2.1 mm**, screw terminal breakout.
-      Must match the plug on A1.
-- **Why:** gets you from the adapter's barrel plug to bare wires you can land on
-  the breadboard rails. Buy 2 — they're cents and easy to lose.
-- 🔗 [Amazon search](https://www.amazon.com/s?k=5.5x2.1mm+female+barrel+jack+screw+terminal+adapter)
-  · [Robu.in](https://robu.in/?s=dc+jack+screw+terminal)
-
-> **Alternative to A1 + A2:** a 5 V 3 A USB charger you already own, plus a
-> **USB-A breakout board**. Same result, one less thing to buy, slightly messier.
-> 🔗 [USB breakout search](https://www.amazon.com/s?k=USB+A+female+breakout+board+screw+terminal)
-
-### A3. Bulk capacitor — 1000 µF, 16 V electrolytic
-
-- [ ] **Spec:** 1000 µF (470 µF acceptable), **16 V or higher**, aluminium
-      electrolytic, low-ESR preferred. Radial/through-hole.
-- **Why:** absorbs the current spike when the servo stalls against the switch,
-  so the spike is served by the capacitor instead of dragging the whole rail
-  down. Fit it **across the servo's V+ and GND, physically close to the servo** —
-  at the far end of a long wire it does much less good.
-- **Polarity matters.** The stripe is the negative leg. Backwards, it can vent.
-- Cheapest route is an assortment kit, which also covers A4.
-- 🔗 [Amazon search](https://www.amazon.com/s?k=1000uF+16V+electrolytic+capacitor)
-  · [Assortment kit](https://www.amazon.com/s?k=electrolytic+capacitor+assortment+kit)
-
-### A4. Ceramic capacitor — 0.1 µF (100 nF)
-
-- [ ] **Spec:** 0.1 µF / 100 nF ceramic, any voltage ≥ 16 V. Usually marked `104`.
-- **Why:** sits in parallel with A3. The big electrolytic is slow and handles the
-  bulk sag; this one handles high-frequency switching noise the electrolytic
-  can't. Standard practice, costs nothing.
-- Comes in any assortment kit.
-- 🔗 [Amazon search](https://www.amazon.com/s?k=0.1uF+100nF+ceramic+capacitor+kit)
-
-### A5. Tactile pushbuttons — Phase 1b trigger
-
-- [ ] **Spec:** 6 × 6 mm through-hole tactile switch, 4-pin, breadboard-friendly.
-      Buy a pack of 20+.
-- **Why:** Phase 1b (`phase1b_button` firmware) needs a physical button on GPIO 4.
-  No resistor needed — the ESP32's internal pull-up handles it.
-- 🔗 [Amazon search](https://www.amazon.com/s?k=6x6mm+tactile+push+button+switch+kit)
-  · [Robu.in](https://robu.in/?s=tactile+switch+6x6)
+> **Do NOT substitute an MB102 breadboard power module.** It's the obvious-looking
+> choice and it will fail here — it sources only a few hundred mA and browns out
+> exactly when the servo stalls, which is the precise failure you're engineering out.
 
 ---
 
 ## B. Order now — cheap, and saves a second shipment
 
-### B1. Digital multimeter
+| # | Item | Spec | Qty | Link | ₹ |
+| --- | --- | --- | --- | --- | --- |
+| B1 | Digital multimeter | DC volts, DC current, continuity buzzer | 1 | [Robocraze — Mastech MAS830L](https://robocraze.com/products/original-mastech-mas830l-digital-pocket-multimeter-with-probes) | 550 |
+| B2 | Logic level converter | 4-channel bidirectional 3.3 V ↔ 5 V | 1 | [Robu — 4-channel](https://robu.in/product/level-converter-4-channel/) | 60 |
 
-- [ ] **Spec:** auto-ranging, DC voltage, DC current (10 A range), continuity beep.
-      An entry-level unit is completely fine.
-- **Why this matters more than it sounds:** the brownout failure looks identical
-  to a firmware bug — the board reboots mid-press and you'll be tempted to debug
-  code. A multimeter across the 5 V rail during a press settles it in ten seconds
-  by showing the voltage sag. Without one you're guessing.
-- 🔗 [Amazon search](https://www.amazon.com/s?k=digital+multimeter+auto+ranging)
+**Subtotal B: ₹610**
 
-### B2. Logic level shifter — contingency, buy but hopefully don't need
+- **B1 matters more than it sounds.** The brownout looks *identical* to a firmware
+  bug — the board reboots mid-press and you'll be tempted to debug code. A meter on
+  the 5 V rail settles it. A basic DT830D at ~₹200 also works if you want to halve
+  this line; the Mastech is just more pleasant and more trustworthy long-term.
+- **B2 is insurance, hopefully unused.** The ESP32 drives 3.3 V logic while the
+  MG90S expects ~5 V. Most MG90S units read 3.3 V PWM fine, so you probably won't
+  need it — but it's a marginal case, and "servo twitches or ignores commands" is
+  exactly what it looks like when it isn't. ₹60 against a confusing evening.
 
-- [ ] **Spec:** 4-channel bidirectional level converter module (3.3 V ↔ 5 V), or a
-      **74AHCT125** if you want the technically-correct part.
-- **Why:** the ESP32 drives 3.3 V logic, but the MG90S expects a ~5 V signal.
-  Most MG90S units read 3.3 V PWM fine, so this probably won't be needed — but
-  it's a marginal case, and "servo twitches or ignores commands" is exactly what
-  it looks like when it isn't. Cheap insurance against a confusing evening.
-- 🔗 [Amazon search](https://www.amazon.com/s?k=4+channel+logic+level+converter+3.3v+5v)
+---
+
+## Cost summary
+
+| Group | ₹ |
+| --- | --- |
+| A — blocks Phase 1 | 499 |
+| B — recommended | 610 |
+| **Parts total** | **1,109** |
+| Shipping (see below) | 150–300 |
+| **Estimated all-in** | **≈ ₹1,250 – 1,400** |
+
+### Shipping — worth 2 minutes of your time
+
+The list above is "best part per item", which spreads across **four vendors**
+(Robu, Sunrom, ElectronicsComp, Robocraze) — so you'd pay shipping four times, and
+that's a big fraction of a ₹1,100 order.
+
+Cheaper in practice: **consolidate onto Robu.in**, which stocks equivalents of
+everything here and ships free above ₹500. You'd trade the exact Sunrom capacitor
+for their [Rubycon 1000 µF 16 V leaded](https://robu.in/product/16zlh1000mhfc10x16-rubycon-1000uf-16v-%C2%B120-plugind10xl16mm-aluminum-electrolytic-capacitors-leaded-rohs/)
+(a better capacitor, slightly dearer) and pick their multimeter and 0.1 µF caps.
+Likely lands in the same ₹1,100–1,300 range all-in, with one delivery.
 
 ---
 
 ## C. Later — do NOT order yet
 
-Deliberately deferred. Each depends on a measurement or decision that hasn't been
-made, and buying now means buying twice.
+Each depends on a measurement or decision not yet made; buying now means buying twice.
 
-- **3D printing filament** — **PETG, not PLA.** PLA creeps under sustained load
-  and softens in a warm room, and this is a part that holds force against a wall
-  for months. Wait until the arm is designed (Phase 4) so you know how much you
-  need.
-- **Mounting adhesive** — 3M VHB tape or Command strips. Depends on the housing
-  size, which depends on the measurements below.
-- **Battery + charging (Phase 5)** — **probably don't. Use mains USB.** See
-  "Can we run it on cells?" below; the arithmetic is not close.
-- **Servos 2..N** — one per additional switch. Order after one switch works
-  end-to-end through Siri.
+- **3D printing filament** — **PETG, not PLA.** PLA creeps under sustained load and
+  softens in a warm room, and this part holds force against a wall for months. Wait
+  until the arm is designed (Phase 4) so you know how much you need.
+- **Mounting adhesive** — 3M VHB or Command strips. Depends on housing size, which
+  depends on the measurements below.
+- **Battery + charging (Phase 5)** — **probably don't. Use mains USB.** See below;
+  the arithmetic is not close.
+- **Servos 2..N** — one per extra switch. Order after one switch works end-to-end
+  through Siri.
 
 ---
 
 ## Can we run it on cells?
 
-Short answer: fine for bench testing, bad for the permanent install — and not for
-the reason you'd expect.
+Fine for bench testing, bad for the permanent install — and not for the expected reason.
 
 ### On the bench (Phase 1/1b) — works
 
-Use **4 × AA NiMH** (Eneloop-type), *not* alkaline:
+Use **4 × AA NiMH** (Eneloop-type), *not* alkaline. Holder:
+[Robocraze 4-cell AA holder](https://robocraze.com/products/aa-4-cell-battery-holder-hard-plastic-6v-battery-case) (~₹50).
 
 | | NiMH ×4 | Alkaline ×4 |
 | --- | --- | --- |
-| Pack voltage | 4.8 V (in the MG90S 4.8–6.0 V range) | 6.0 V nominal, ~6.4 V fresh |
+| Pack voltage | 4.8 V (inside MG90S 4.8–6.0 V range) | 6.0 V nominal, ~6.4 V fresh |
 | Internal resistance | ~20–50 mΩ/cell | ~150–300 mΩ/cell, rising as they drain |
 | Sag at 750 mA stall | small | **0.5–1 V** |
 
-Alkalines look better on the voltage spec and are the wrong answer. Their internal
+Alkalines look better on the voltage spec and are the wrong answer — their internal
 resistance recreates the exact brownout the separate supply exists to prevent, and
 it worsens as the cells age.
 
-Even so, prefer the wall adapter during bring-up: a pack whose voltage droops as
-it discharges is a moving variable, and Phase 1 is precisely when you want the
-power supply to be the one thing that isn't a suspect.
+Even so, prefer the adapter during bring-up: a pack whose voltage droops as it
+discharges is a moving variable, and Phase 1 is exactly when the power supply should
+be the one thing that *isn't* a suspect.
 
 ### Permanently (Phase 5) — no
 
@@ -166,36 +148,34 @@ power supply to be the one thing that isn't a suspect.
 | Servo presses (10/day, ~1 s each) | 750 mA peak | **~2 mAh** |
 | ESP32 idle, WiFi connected | ~80 mA continuous | **~1900 mAh** |
 
-The servo is roughly 0.1 % of the energy budget. On 4 × AA NiMH (2000 mAh) that's
-**about one day** per charge. Aggressive modem-sleep/DTIM tuning might average
-~25 mA and reach ~3 days — still a device you service twice a week.
+The servo is ~0.1 % of the energy budget. On 4 × AA NiMH (2000 mAh) that's **about
+one day** per charge. Aggressive modem-sleep/DTIM tuning might average ~25 mA and
+reach ~3 days — still a device you service twice a week.
 
 Deep sleep is not an escape: HomeKit requires the accessory to stay reachable, so
-the radio has to stay up.
+the radio stays up.
 
-**Conclusion: run the permanent install from mains USB.** A phone charger and a
-cable to the switchboard beats a battery that dies every few days. If a wire to
-the board is genuinely unacceptable, that's a reason to reconsider the whole
-approach (e.g. a BLE/Thread accessory that can sleep), not to add batteries.
+**Conclusion: run the permanent install from mains USB.** If a wire to the board is
+genuinely unacceptable, that's a reason to reconsider the approach (a BLE/Thread
+accessory that can sleep), not to add batteries.
 
 ---
 
 ## Measurements needed
 
-I need these before Phase 4 CAD, and they also settle whether the MG90S is
-strong enough at all. Rough numbers beat no numbers — a kitchen scale is fine.
+Needed before Phase 4 CAD, and they settle whether the MG90S is strong enough at
+all. Rough numbers beat no numbers — a kitchen scale is fine.
 
 ### 1. Actuation force ⭐ most important
 
-- [ ] Press a **kitchen scale** against the switch rocker until it flips. Record
-      the **peak reading in grams**. Do it three times, keep the highest.
-- Determines the maximum usable arm length. Torque is force × distance, so a long
-  arm is a weak arm — too long and it stalls instead of flipping.
+- [ ] Press a **kitchen scale** against the switch rocker until it flips. Record the
+      **peak reading in grams**. Three times, keep the highest.
+- Sets the maximum usable arm length. Torque is force × distance, so a long arm is a
+  weak arm — too long and it stalls instead of flipping.
 
 ### 2. Throw distance
 
 - [ ] How far the rocker tip travels between fully-off and fully-on, in **mm**.
-      Ruler is fine, calipers better.
 - Sets the servo sweep angle.
 
 ### 3. Rocker geometry
@@ -206,12 +186,12 @@ strong enough at all. Rough numbers beat no numbers — a kitchen scale is fine.
 ### 4. Gang pitch
 
 - [ ] **Centre-to-centre distance between adjacent switches**, in mm.
-- Needed for the multi-servo housing later. Cheap to measure now while you're there.
+- Needed for the multi-servo housing later. Cheap to measure now.
 
 ### 5. Clearance
 
 - [ ] How far the switch plate **protrudes from the wall** (mm).
-- [ ] Flat wall space **above / below / beside** the board available for mounting (mm).
+- [ ] Flat wall space **above / below / beside** the board (mm).
 - [ ] Anything in the way — door frame, furniture, trim?
 
 ### 6. Photos ⭐ nearly as useful as the numbers
