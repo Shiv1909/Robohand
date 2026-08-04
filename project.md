@@ -141,6 +141,11 @@ whether this works at all.
       of the auto-loop.
   - [x] Firmware written and compiling — `src/phase1b_button.cpp`
   - [ ] Flashed and validated on real hardware
+- [ ] **Phase 1c — Two-position toggle.** Separate ON and OFF angles with state
+      tracking, because a rocker has two press points. Same wiring as 1b.
+  - [x] Firmware written and compiling — `src/phase1c_toggle.cpp`
+  - [x] State machine unit-tested — `include/switch_state.h`, 13 tests
+  - [ ] Flashed and validated on real hardware
 - [ ] ~~**Phase 2 — Wireless trigger.**~~ **SKIPPED.** HomeSpan in Phase 3 subsumes
       it — a native HomeKit accessory already gives phone control *and* Siri from
       the same code, so a standalone web trigger is throwaway work.

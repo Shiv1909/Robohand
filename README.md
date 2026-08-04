@@ -17,6 +17,7 @@ Hardware is on order. Nothing has run on a real board yet.
 | 0 — Simulation | ✅ done (Arduino Uno, in Wokwi) |
 | 1 — Servo moves on real hardware | firmware written + compiling, **not yet flashed** |
 | 1b — Debounced button trigger | firmware written + compiling + unit-tested, **not yet flashed** |
+| 1c — Two-position on/off toggle | firmware written + compiling + unit-tested, **not yet flashed** |
 | 2 — WiFi trigger | ⏭️ skipped — HomeSpan subsumes it |
 | 3 — Siri / Apple Home | deliberately deferred until 1 and 1b are validated on hardware |
 | 4 — 3D-printed arm and mount | blocked on switch measurements |
@@ -33,8 +34,9 @@ ground. Full parts list with links and prices: **[BOM.md](BOM.md)**.
 # compile
 pio run -e phase1_autopress          # servo presses every 3s, no inputs
 pio run -e phase1b_button            # servo presses on a debounced button
+pio run -e phase1c_toggle            # button toggles between on/off angles
 
-# run logic tests on your PC — no ESP32 needed
+# run logic tests on your PC — no ESP32 needed (21 tests)
 pio test -e native
 
 # flash
@@ -52,10 +54,13 @@ pre-flight checklist — reversed polarity on the servo supply will kill the ESP
 ```
 src/phase1_autopress.cpp    Phase 1 firmware. Known-good baseline; keep it working.
 src/phase1b_button.cpp      Phase 1b firmware. Standalone by design.
+src/phase1c_toggle.cpp      Phase 1c firmware. Two-position on/off with state.
 include/debounce.h          Debounce logic, free of Arduino calls so it unit-tests.
+include/switch_state.h      On/off state machine. Idempotent — see below.
 test/test_debounce/         8 native Unity tests for the debouncer.
+test/test_switch_state/     13 native Unity tests for the state machine.
 test/wokwi/                 Wokwi scenario (blocked — see project.md).
-platformio.ini              Three environments: two firmware, one native test.
+platformio.ini              Four environments: three firmware, one native test.
 project.md                  Plan, phase status, and every gotcha learned so far.
 BOM.md                      Parts list, prices, power analysis, measurements.
 WIRING.md                   Wiring diagram and first-power-on checklist.
@@ -79,6 +84,9 @@ Full list in [project.md](project.md). The ones that cost the most time:
 - **Rockers need two press points.** Press the top for ON, the bottom for OFF. A
   single-point presser can only ever switch one way — solved with a push-pull tether,
   the same approach SwitchBot uses.
+- **State changes must be idempotent.** Apple Home re-sends state freely. Actuating
+  on a redundant "turn on" would physically press the switch again and turn the light
+  *off*. `switch_state.h` returns `Action::None` in that case, and it's unit-tested.
 - **Wokwi cannot simulate ESP32 here.** AVR works fine with the same CLI and token;
   ESP32 produces no serial and never executes. Ruled out across both the CLI and the
   VS Code extension. Probably why Phase 0 was done on an Uno.

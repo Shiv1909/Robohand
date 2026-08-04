@@ -175,3 +175,26 @@ Once Phase 1 works, add the button — **one new thing**:
 If the servo stops working at this point, flash `phase1_autopress` again. If that
 still works, the fault is in the button wiring, not the servo — which is exactly why
 the baseline is kept around.
+
+---
+
+## Phase 1c addition
+
+**No wiring change at all** — identical circuit to 1b. Purely firmware.
+
+- [ ] `pio run -e phase1c_toggle -t upload`
+- [ ] Expect `Fingerbot Phase 1c ready. Press the button to toggle.`
+- [ ] Each press alternates: `>> Turning ON` / `>> Turning OFF`, with the arm
+      swinging to a *different* angle each way and returning to neutral between.
+
+This is where you calibrate the three angles against the real switch. In
+`src/phase1c_toggle.cpp`:
+
+| Constant | Default | What to tune it for |
+| --- | --- | --- |
+| `REST_ANGLE` | 90 | arm clear of the rocker, touching nothing |
+| `ON_ANGLE` | 60 | far enough to flip it one way |
+| `OFF_ANGLE` | 120 | far enough to flip it the other way |
+
+**If it turns on when you expected off, swap `ON_ANGLE` and `OFF_ANGLE`.** That's
+the entire fix — the logic doesn't care which direction is which.
