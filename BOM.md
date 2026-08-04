@@ -191,6 +191,26 @@ already got**; listed here so the order is complete either way.
 
 ---
 
+## What Phase 3 (Siri) needs — no extra hardware
+
+HomeSpan makes the ESP32 itself a native HomeKit accessory. No bridge, no hub
+purchase, no subscription. **The parts list above is already complete for Siri.**
+
+What it does need, none of it purchasable:
+
+- **A 2.4 GHz WiFi band.** The ESP32 cannot see 5 GHz at all. Routers that broadcast
+  one merged SSID with band-steering frequently fail to pair, in a way that reads as
+  a firmware bug. Be ready to expose a 2.4 GHz-only SSID temporarily.
+- **An iPhone or iPad** with the Home app, to pair the accessory.
+- **WiFi credentials in `include/secrets.h`** — gitignored, because this repo is public.
+
+**A HomeKit hub (Apple TV / HomePod) is optional.** "Hey Siri, turn on the fan"
+works from your iPhone with no hub while you're on the same WiFi. A hub is only
+required for control from *outside* the house, and for automations. Don't buy one
+for this project unless you specifically want those.
+
+---
+
 ## Later — do NOT order yet
 
 Each depends on a measurement or decision not yet made; buying now means buying twice.
