@@ -15,23 +15,43 @@ in stock there, so it ships as one parcel with one delivery. Robu ships free abo
 Everything needed to build and finish **Phase 1 + Phase 1b**. Nothing here is
 speculative; nothing for Phase 4/5 is included.
 
-| # | Item | Link | Qty | ₹ |
-| --- | --- | --- | --- | --- |
-| 1 | ESP32 DevKit, 38-pin | [Robu](https://robu.in/product/esp32-38pin-development-board-wifibluetooth-ultra-low-power-consumption-dual-core/) | 1 | 500 |
-| 2 | MG90S servo **180°** | [Robu](https://robu.in/product/towerpro-mg90s-mini-digital-servo-motor-180-rotation-standard-quality/) | 1 | 239 |
-| 3 | Breadboard, 830 pt | [Robu](https://robu.in/product/transparent-830-points-solderless-breadboard/) | 1 | 110 |
-| 4 | Jumper wires, M-M + M-F | [Robu](https://robu.in/product-category/dupont-cable/) | 2 sets | 160 |
-| 5 | 5 V **3 A** adapter | [Robu](https://robu.in/product/orange-5v-3a-power-supply-adapter-charger-with-5-5mm-dc-plug/) | 1 | 350 |
-| 6 | DC jack, female w/ wires | [Robu](https://robu.in/product/dc-jack-connector-female-2-1mm-x-5-5mm-with-wire/) | 1 | 40 |
-| 7 | 1000 µF 16 V, **leaded** | [Robu](https://robu.in/product/16zlh1000mhfc10x16-rubycon-1000uf-16v-%C2%B120-plugind10xl16mm-aluminum-electrolytic-capacitors-leaded-rohs/) | 3 | 45 |
-| 8 | Ceramic capacitor kit | [Robu](https://robu.in/product/ceramic-capacitor-assorted-kit-30-kinds-from-2pf-0-1uf/) | 1 | 150 |
-| 9 | Tactile pushbuttons | [Robu](https://robu.in/product/6x6x5mm-tactile-push-button-switch-pack-of-20/) | 20-pk | 75 |
-| 10 | Multimeter | [Robu](https://robu.in/product/haoyue-mas830l-digital-handheld-multimeter-600-vac-dc/) | 1 | 450 |
-| 11 | Logic level converter | [Robu](https://robu.in/product/level-converter-4-channel/) | 1 | 60 |
+Tick these off as you order / as they arrive.
+
+**Core — skip any already ordered**
+
+- [ ] **1. ESP32 DevKit, 38-pin** — ₹500 —
+      [Robu](https://robu.in/product/esp32-38pin-development-board-wifibluetooth-ultra-low-power-consumption-dual-core/)
+- [ ] **2. MG90S servo — must say 180°** — ₹239 —
+      [Robu](https://robu.in/product/towerpro-mg90s-mini-digital-servo-motor-180-rotation-standard-quality/)
+- [ ] **3. Breadboard, 830 points** — ₹110 —
+      [Robu](https://robu.in/product/transparent-830-points-solderless-breadboard/)
+- [ ] **4. Jumper wires, M-M + M-F** (2 sets) — ₹160 —
+      [Robu](https://robu.in/product-category/dupont-cable/)
+
+**Power + brownout fix + Phase 1b**
+
+- [ ] **5. 5 V 3 A adapter**, 5.5×2.1 mm — ₹350 —
+      [Robu](https://robu.in/product/orange-5v-3a-power-supply-adapter-charger-with-5-5mm-dc-plug/)
+- [ ] **6. DC jack, female with wires** — ₹40 —
+      [Robu](https://robu.in/product/dc-jack-connector-female-2-1mm-x-5-5mm-with-wire/)
+- [ ] **7. 1000 µF 16 V leaded ×3** — ₹45 —
+      [Robu](https://robu.in/product/16zlh1000mhfc10x16-rubycon-1000uf-16v-%C2%B120-plugind10xl16mm-aluminum-electrolytic-capacitors-leaded-rohs/)
+- [ ] **8. Ceramic capacitor kit** — ₹150 —
+      [Robu](https://robu.in/product/ceramic-capacitor-assorted-kit-30-kinds-from-2pf-0-1uf/)
+- [ ] **9. Tactile pushbuttons ×20** — ₹75 —
+      [Robu](https://robu.in/product/6x6x5mm-tactile-push-button-switch-pack-of-20/)
+
+**Tools — not parts; droppable to save ₹510**
+
+- [ ] **10. Multimeter (MAS830L)** — ₹450 —
+      [Robu](https://robu.in/product/haoyue-mas830l-digital-handheld-multimeter-600-vac-dc/)
+- [ ] **11. Logic level converter, 4-ch** — ₹60 —
+      [Robu](https://robu.in/product/level-converter-4-channel/)
 
 ### **Total: ₹2,179** — shipping free (Robu, above ₹500)
 
 **Skip items 1–4 if already ordered → ₹1,170.**
+**Skip 10–11 as well → ₹660 absolute minimum.**
 
 Three checks before paying:
 
