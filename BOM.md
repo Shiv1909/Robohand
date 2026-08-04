@@ -139,25 +139,100 @@ Even so, prefer the adapter during bring-up: a pack whose voltage droops as it
 discharges is a moving variable, and Phase 1 is exactly when the power supply should
 be the one thing that *isn't* a suspect.
 
-### Permanently (Phase 5) — no
+### Permanently (Phase 5) — yes, with WiFi light sleep
 
-**The servo is not the power problem. The always-on WiFi is.**
+> **Correction.** An earlier version of this file said battery was impractical and
+> quoted ~80 mA idle. That is the ESP32's **untuned default**, not its floor. With
+> `esp_wifi_set_ps()` + auto light-sleep, measured idle is **~7.5 mA** at DTIM3.
+> That is a ~10× difference and it changes the conclusion. Portable is viable.
+
+**The servo is not the power problem — it never was. Idle radio current is.**
 
 | Load | Draw | Per day |
 | --- | --- | --- |
-| Servo presses (10/day, ~1 s each) | 750 mA peak | **~2 mAh** |
-| ESP32 idle, WiFi connected | ~80 mA continuous | **~1900 mAh** |
+| Servo presses (10/day, ~1 s each) | 750 mA peak | **~10 mWh** |
+| ESP32 idle, WiFi + auto light-sleep | ~7.5 mA @ 3.3 V | **~600 mWh** |
 
-The servo is ~0.1 % of the energy budget. On 4 × AA NiMH (2000 mAh) that's **about
-one day** per charge. Aggressive modem-sleep/DTIM tuning might average ~25 mA and
-reach ~3 days — still a device you service twice a week.
+The servo is under 2 % of the budget. Runtime is set almost entirely by idle draw.
 
-Deep sleep is not an escape: HomeKit requires the accessory to stay reachable, so
-the radio stays up.
+Light sleep — not deep sleep — is the key. The radio still wakes on every DTIM
+beacon, so the accessory stays reachable with sub-second latency. Deep sleep would
+break HomeKit; light sleep does not.
 
-**Conclusion: run the permanent install from mains USB.** If a wire to the board is
-genuinely unacceptable, that's a reason to reconsider the approach (a BLE/Thread
-accessory that can sleep), not to add batteries.
+**Estimated runtime on one 18650 (3000 mAh ≈ 11 Wh):**
+
+| Configuration | Avg draw | Runtime |
+| --- | --- | --- |
+| Stock devkit + light sleep | ~20 mA | **~5–7 days** |
+| Devkit with power LED + USB-UART chip disabled | ~8 mA | **~2 weeks** |
+| ESP32-C6 + Matter over Thread (sleepy end device) | <1 mA | **months** |
+
+> **The dev board is the hidden cost.** A bare ESP32 module hits ~7.5 mA, but a
+> DevKitC also runs a CP2102/CH340 USB-serial chip and a power LED that never
+> sleep — typically 10–20 mA on their own, more than the ESP32 itself. Cutting the
+> LED trace and unpowering the USB chip roughly doubles runtime. **Measure yours
+> with the multimeter (B1) before sizing a battery** — board variants differ wildly.
+
+**Verdict: portable works. Budget a recharge every 1–2 weeks.** For months-long
+life you need Thread, not WiFi — see Section D.
+
+---
+
+## D. Portable power — order with Phase 5, not now
+
+Three routes. Pick one; don't buy all three.
+
+### D1. Power bank — simplest, zero new circuitry ⭐ start here
+
+- [ ] Any USB power bank + the ESP32's existing USB cable.
+- **Why start here:** proves the whole portable idea with no soldering and no new
+  failure modes. If a weekly recharge is acceptable, you may never need D2.
+- **The one gotcha:** most power banks **auto-shut-off below ~50–100 mA draw**, and
+  a sleeping ESP32 pulls far less than that — so the bank switches itself off and
+  your accessory dies. You need one advertised as **"low-current mode"**,
+  **"always-on"**, or intended for trickle devices. Test before committing.
+
+### D2. 18650 + charger + boost — proper portable build
+
+| # | Item | Spec | Link | ₹ |
+| --- | --- | --- | --- | --- |
+| D2a | Charger module | TP4056 **with protection** (DW01), Type-C | [Robocraze — TP4056 Type-C w/ protection](https://robocraze.com/products/tp4056-battery-charger-c-type-module-with-protection-1) | 60 |
+| D2b | Boost converter | MT3608, 3.7 V → 5 V, 2 A max | [Robu — MT3608](https://robu.in/product/mt3608-2a-max-dc-dc-step-up-power-module-booster-power-module/) | 60 |
+| D2c | 18650 cell | 3000 mAh, **genuine** Samsung/LG/Sony | buy locally — see warning | 350 |
+| D2d | Cell holder | 1× 18650, wire leads | [Robocraze — 18650 shield](https://robocraze.com/products/18650-lithium-battery-holder-shield-module-micro-usb) | 40 |
+
+**Subtotal D2: ≈ ₹510**
+
+Notes that will save you a bad evening:
+
+- **Get the protected TP4056 (with DW01), not the bare charger.** Li-ion cells
+  discharged below ~2.5 V are damaged, and can be dangerous. The protection IC is
+  ~₹10 of the price. Non-negotiable.
+- **TP4056 modules do not do load-sharing.** Running the circuit while charging
+  confuses charge termination. Either power the device off while charging, or buy
+  a module that explicitly supports load sharing.
+- **MT3608 at 2 A is a headline number.** Boosting 3.7 V → 5 V at 750 mA stall
+  means ~1.2 A on the input side, which is near its comfortable limit. **The
+  1000 µF capacitor (A3) matters more here than on a wall adapter**, not less.
+- **18650 counterfeits are rampant.** A cell claiming 6000 mAh is fake — genuine
+  18650s top out around 3500 mAh. Buy from a reputable seller and expect ~₹350 for
+  a real 3000 mAh cell.
+
+### D3. Months, not weeks — Matter over Thread
+
+Different board, different protocol, much more firmware work.
+
+- **ESP32-C6** or **ESP32-H2** (the classic ESP32 has no 802.15.4 radio, so your
+  current board cannot do this).
+- Thread lets the device be a **Sleepy End Device** — sub-1 mA average, months to a
+  year on the same battery — while staying reachable to Siri.
+- **Requires a Thread border router**: HomePod mini or Apple TV 4K. If you don't
+  own one, that's a far bigger cost than the battery.
+- Replaces HomeSpan with the Matter SDK. Substantially harder than Phase 3 as
+  currently planned.
+
+**Recommendation: do D1 now, D2 if you want a tidy integrated build, and only
+consider D3 if weekly charging genuinely fails the use case.**
 
 ---
 
