@@ -48,6 +48,42 @@ Tick these off as you order / as they arrive.
 - [ ] **11. Logic level converter, 4-ch** — ₹60 —
       [Robu](https://robu.in/product/level-converter-4-channel/)
 
+### If something is out of stock — verified alternates
+
+**ESP32 DevKit**
+
+- [Espressif ESP32-DevKitC-32E](https://robu.in/product/espressif-esp32-devkitc-esp32-wroom-3-2e-development-board/) — official Espressif, PCB antenna
+- [ESP32-WROVER-E DevKitC](https://robu.in/product/esp32-wroom-e-esp32-devkitc-core-board-for-arduino/) — adds PSRAM, harmless here
+
+> ⚠️ **Avoid the "U" and "UE" variants** (ESP32-WROOM-32**U**, 32**UE**). Those have
+> a u.FL connector *instead of* a PCB antenna — no antenna in the box, so WiFi
+> effectively won't work until you buy one. Easy to order by mistake; the listings
+> look almost identical.
+
+**MG90S servo**
+
+- [MG90S 9g Servo Metal Gear](https://robu.in/product/mg90s-9g-servo-metal-gear/)
+- [TowardPro MG90S 180°](https://robu.in/product/towardpro-mg90s-mini-digital-servo-2-2kg-0-08sec-13g/)
+- [ACEBOTT MG90 180°](https://robu.in/product/acebott-mg90-metal-gear-micro-servo-motor-180-degrees-compatible-with-esp32-arduino/)
+
+> ⚠️ Never the **360° continuous rotation** version — it cannot hold an angle.
+
+**Breadboard**
+
+- [MB102 830 points](https://robu.in/product/mb102-830-points-solderless-prototype-pcb-breadboard-high-quality/)
+- [ZY-201 830 points](https://robu.in/product/zy-201-830-points-solderless-breadboard/)
+
+**5 V adapter**
+
+- [Orange 5V 3A, BIS approved](https://robu.in/product/orange-5v-3a-power-adapter-with-dc-plug-bis-approved)
+- [Orange 5V 2A, dual pin DC](https://robu.in/product/orange-5v-2a-power-supply-with-dual-pin-dc-plug-adapter/) — 2 A is
+  fine for one servo; only limits you when scaling to several
+
+> ⚠️ **The plug must be 5.5 × 2.1 mm.** Robu also stocks a
+> [Pro-Range 5V 3A with a 5.5 × **2.5** mm plug](https://robu.in/product/pro-range-5v-3a-power-adapter/) —
+> that will not seat properly in the 2.1 mm pigtail jack (item 6) and gives an
+> intermittent connection, which looks exactly like a brownout. Do not mix sizes.
+
 ### **Total: ₹2,179** — shipping free (Robu, above ₹500)
 
 **Skip items 1–4 if already ordered → ₹1,170.**
