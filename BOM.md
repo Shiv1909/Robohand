@@ -222,6 +222,25 @@ Each depends on a measurement or decision not yet made; buying now means buying 
   `project.md`). Depends on rocker dimensions.
 - **Servos 2..N** — one per extra switch. Order after one switch works end-to-end
   through Siri.
+- **[PCA9685 16-channel servo driver](https://robu.in/product/16-channel-12-bit-pwmservo-driver-i2c-interface-pca9685-arduino-raspberry-pi/)**
+  (~₹300) — for the multi-gang build. Drives 16 servos over 2 I2C pins with its own
+  PWM hardware, and gives a clean place to feed servo power separately from logic.
+  **This is what makes the board choice stop mattering** for servo count — see below.
+- **A smaller board for the final build** — tempting, but do NOT buy one yet:
+  - [ESP32-C3 SuperMini](https://robu.in/product/esp32-c3-development-board-esp32-supermini/)
+    is 22.5 × 18 mm and would shrink a single-switch build to roughly SwitchBot size.
+  - **But the C3 has only 6 LEDC PWM channels.** Six servos = exactly six, zero
+    margin, before ESP32Servo reserves timers. The classic ESP32 has 16. The board
+    that shrinks the product is the one that makes scaling harder — unless you use
+    the PCA9685 above, which sidesteps it entirely.
+  - **If you go Thread/Matter (D3), you need a C6, not a C3** — the C3 has no
+    802.15.4 radio. Buying a C3 now silently commits you to WiFi.
+  - The SuperMini form factor is widely reported to have **weak WiFi range** from its
+    antenna layout, especially in clones. Risky for a device that must stay connected
+    behind a switchboard.
+
+  Order of operations: one switch working on the DevKitC → PCA9685 when scaling to
+  six → pick a small board last, once WiFi-vs-Thread is decided.
 - **Battery parts** — see Section D. Do the power-bank test first.
 
 ---
