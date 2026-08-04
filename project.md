@@ -34,6 +34,45 @@ voice-control specific switches on it. **We start with ONE switch, all the way
 through Siri, then replicate.** One ESP32 can drive several servos, each exposed to
 Apple Home as its own named accessory — so one brain controls the whole board.
 
+## The rocker problem (found 2026-08-04, from photos of the actual board)
+
+The target is a **6-gang rocker switchboard**, and rockers are not buttons. You
+press the **top** for ON and the **bottom** for OFF. They pivot in the middle, so
+pressing the centre does nothing at all.
+
+**A single arm that presses one spot can therefore only ever switch one way.** As
+currently written, the firmware would turn a light on and then be unable to turn it
+off. This is the same constraint that makes a commercial SwitchBot need its
+stick-on lever accessory.
+
+The fix is geometric, and it still only needs one servo per switch: mount the servo
+so its pivot sits level with the **rocker's horizontal centreline**, with an arm
+long enough to reach both halves.
+
+```
+        ┌─────────┐
+        │  upper  │  <- arm swings UP to here  = ON
+   ●====│ - - - - │     ● = servo pivot, level with rocker centre
+        │  lower  │  <- arm swings DOWN to here = OFF
+        └─────────┘
+```
+
+Rest position is the neutral middle, touching nothing.
+
+### What this changes
+
+- **Phase 4 (mechanical):** the mount must be centred vertically on the rocker, not
+  offset above or below it. Arm length must clear both halves without fouling the
+  plate. This constrains the design far more than a simple press would.
+- **Phase 3 (firmware):** the accessory is a **stateful switch, not a momentary
+  press**. `PRESS_ANGLE` becomes two angles — `ON_ANGLE` and `OFF_ANGLE` — with a
+  neutral rest between them, and the ESP32 must track which state it last set.
+- **Known limitation:** the ESP32 cannot tell whether someone flipped the switch by
+  hand, so its idea of the state can drift out of sync with reality. Options are to
+  accept it, or add a sensor later. Worth deciding before Phase 3, not after.
+
+Phase 1/1b firmware is unaffected — it only ever needed to prove motion.
+
 ## Phased plan
 
 - [x] **Phase 0 — Simulation.** Press logic proven in Wokwi.

@@ -241,37 +241,52 @@ consider D3 if weekly charging genuinely fails the use case.**
 Needed before Phase 4 CAD, and they settle whether the MG90S is strong enough at
 all. Rough numbers beat no numbers — a kitchen scale is fine.
 
-### 1. Actuation force ⭐ most important
+### Received 2026-08-04
 
-- [ ] Press a **kitchen scale** against the switch rocker until it flips. Record the
+Photos of the target board. **6-gang modular switchboard**, single horizontal row,
+rocker-style modules (Anchor/Roma-type). Plenty of clear flat wall above and below —
+mounting space is not a constraint.
+
+| Measurement | Value | Confidence |
+| --- | --- | --- |
+| Module width | ~2 cm | plausible — matches the ~22 mm Indian modular standard |
+| Module height | ~7 cm (AR) | **doubtful — see below** |
+| Gang count | 6 | confirmed from photo |
+| Gang pitch | ~2 cm (≈ module width, modules abut) | inferred, needs confirming |
+| Mounting space | ample above and below | confirmed from photo |
+
+> **The 7 cm reading looks wrong.** In the photos the rockers are roughly twice as
+> tall as they are wide (~1 : 2). If the width is genuinely 2 cm, the height should
+> be ~4–4.5 cm, which also matches the standard Indian modular module (~22 × 45 mm).
+> 7 cm would make it 1 : 3.5, which the photo does not show. The AR tape was
+> probably measuring plate edge to plate edge rather than the rocker face.
+> **Re-measure the rocker face with a ruler.**
+
+### Still needed
+
+#### 1. Actuation force ⭐ still the blocker
+
+- [ ] Press a **kitchen scale** against the rocker until it flips. Record the
       **peak reading in grams**. Three times, keep the highest.
-- Sets the maximum usable arm length. Torque is force × distance, so a long arm is a
-  weak arm — too long and it stalls instead of flipping.
+- Nothing about the arm can be finalised without this. Torque is force × distance,
+  so it sets the maximum arm length directly.
 
-### 2. Throw distance
+#### 2. Throw distance
 
-- [ ] How far the rocker tip travels between fully-off and fully-on, in **mm**.
+- [ ] How far the rocker end travels between fully-off and fully-on, in **mm**.
 - Sets the servo sweep angle.
 
-### 3. Rocker geometry
+#### 3. Rocker face — re-measure with a ruler
 
-- [ ] Rocker face **height × width** in mm.
-- [ ] Which end you press for ON (top or bottom).
+- [ ] Rocker **height × width** in mm (the AR numbers above are suspect).
+- [ ] Confirm gang pitch: **centre-to-centre between two adjacent modules**, mm.
 
-### 4. Gang pitch
+#### 4. Clearance
 
-- [ ] **Centre-to-centre distance between adjacent switches**, in mm.
-- Needed for the multi-servo housing later. Cheap to measure now.
+- [ ] How far the switch plate **protrudes from the wall**, mm.
+- [ ] How far the rocker face sits **proud of the plate**, mm.
 
-### 5. Clearance
+#### 5. Side-on photo
 
-- [ ] How far the switch plate **protrudes from the wall** (mm).
-- [ ] Flat wall space **above / below / beside** the board (mm).
-- [ ] Anything in the way — door frame, furniture, trim?
-
-### 6. Photos ⭐ nearly as useful as the numbers
-
-- [ ] Straight-on shot of the switchboard **with a ruler in frame**.
-- [ ] Side-on shot showing the rocker in both positions.
-
-Drop the photos in this folder and I'll work from them.
+- [ ] Side view of one switch showing the rocker in **both** positions. Needed to
+      see the pivot and how far each end moves.
