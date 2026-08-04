@@ -264,12 +264,55 @@ mounting space is not a constraint.
 
 ### Still needed
 
-#### 1. Actuation force ⭐ still the blocker
+#### 1. Actuation force — NOT a blocker after all
 
-- [ ] Press a **kitchen scale** against the rocker until it flips. Record the
-      **peak reading in grams**. Three times, keep the highest.
-- Nothing about the arm can be finalised without this. Torque is force × distance,
-  so it sets the maximum arm length directly.
+Originally listed as the thing gating the mechanical design. It isn't, because the
+design space is one variable (arm length) over a narrow useful range (20–30 mm).
+
+**Empirical approach instead — print three arms and test:**
+
+- [ ] Print arms at **20 mm, 25 mm, 30 mm**.
+- [ ] Try the **20 mm first** — shortest arm, maximum force (~9.8 N @ 6 V, comfortably
+      above SwitchBot's 8 N).
+- [ ] Move longer only if you need more travel at the rocker.
+
+If even the 20 mm arm won't flip it, the servo is undersized and no arm length fixes
+that — the answer is a stronger servo (MG996R or similar), not more geometry. That
+outcome is itself the measurement.
+
+Indian modular rockers are typically light (roughly 2–4 N), so a 20 mm MG90S arm
+should have healthy margin.
+
+**How to measure it, if you want a real number anyway.**
+
+*Method A — hanging weight. No equipment to buy, and it measures PULL force, which
+is what the tether design actually needs.*
+
+1. Stick a tab of strong tape (folded to leave a loop) on the rocker's lower half.
+2. Tie a string to it and hang an empty sealed bottle.
+3. Add water gradually — take the bottle down to fill, cap it, rehang.
+4. When the rocker flips, measure the water in a jug. **1 ml = 1 g.** Add the
+   bottle's own weight.
+
+> ⚠️ Fill away from the board and keep the bottle capped. That's mains wiring
+> behind the plate.
+
+*Method B — kitchen scale + video.* Scales read force on the platform in any
+orientation; they just need re-taring. Hold it sideways in the pressing position,
+tare to zero, start a video of the display, press it into the rocker until it
+clicks, then scrub back to the click frame. The video works around the fact that
+most kitchen scales don't hold a peak reading.
+
+*Method C — luggage/fish scale (~₹200).* Hook onto the taped tab and pull. Easiest
+and reusable.
+
+**Converting:** newtons = grams ÷ 102.
+
+| Reading | Force | Verdict |
+| --- | --- | --- |
+| < 400 g | < 3.9 N | easy — any arm 20–30 mm works |
+| 400–800 g | 3.9–7.8 N | use a 20–25 mm arm |
+| > 800 g | > 7.8 N | MG90S marginal — consider MG996R |
 
 #### 2. Throw distance
 
