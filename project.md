@@ -45,19 +45,33 @@ currently written, the firmware would turn a light on and then be unable to turn
 off. This is the same constraint that makes a commercial SwitchBot need its
 stick-on lever accessory.
 
-The fix is geometric, and it still only needs one servo per switch: mount the servo
-so its pivot sits level with the **rocker's horizontal centreline**, with an arm
-long enough to reach both halves.
+### Solution: push-pull with a tether (how SwitchBot does it)
+
+An earlier draft of this section proposed a centre-pivot arm sweeping up and down
+to hit both halves. **That was wrong for this board** — it needs clearance *beside*
+the rocker, and on a 6-gang plate the modules abut each other, so there is none.
+
+SwitchBot solves it vertically instead, and the same approach fits here. Mount the
+servo **below** the switch. Stick a small **adhesive tab onto the rocker face** and
+run a short tether from the arm to that tab. Now one contact point does both jobs:
 
 ```
-        ┌─────────┐
-        │  upper  │  <- arm swings UP to here  = ON
-   ●====│ - - - - │     ● = servo pivot, level with rocker centre
-        │  lower  │  <- arm swings DOWN to here = OFF
-        └─────────┘
+   ┌─────────┐
+   │  upper  │
+   │ - - - - │   <- rocker pivot
+   │ [tab]   │   <- adhesive tab + tether
+   └────┬────┘
+        │  arm rotates one way  -> PUSHES tab in   -> state B
+   ●════╯  arm rotates other way -> PULLS tab out  -> state A
+   servo below the plate
 ```
 
-Rest position is the neutral middle, touching nothing.
+Pulling the lower half outward rocks the switch exactly as pressing the upper half
+would — so a single point, pushed and pulled, covers both directions.
+
+Trade-off: it requires sticking something to the switch, which the sweep design
+avoided. That is the price of working on a multi-gang plate, and the commercial
+product pays it too.
 
 ### What this changes
 
@@ -72,6 +86,46 @@ Rest position is the neutral middle, touching nothing.
   accept it, or add a sensor later. Worth deciding before Phase 3, not after.
 
 Phase 1/1b firmware is unaffected — it only ever needed to prove motion.
+
+### Benchmarks from the commercial SwitchBot Bot
+
+Useful design targets, from their published spec:
+
+| Spec | SwitchBot Bot | Implication for us |
+| --- | --- | --- |
+| Press force | **8 N** (1.15 kgf) | our force target |
+| Arm stroke | 12 mm | rocker throw is small; sweep can be modest |
+| Movement angle | 120° | well inside the MG90S range |
+| Size | 43 × 37 × 24 mm | **wider than a 22 mm module — see below** |
+| Battery | CR2 3 V, 600 days @ 2/day | ≈ 55 µA average. Only possible over BLE |
+| Radio | Bluetooth 4.2, hub for Siri | not WiFi — deliberately |
+
+**Arm length falls straight out of the 8 N target.** The MG90S gives 2.0 kg·cm at
+6 V ≈ 19.6 N·cm, so force at the tip is `19.6 / r` newtons with `r` in cm:
+
+| Arm length | Force at tip @ 6 V | @ 4.8 V (1.8 kg·cm) |
+| --- | --- | --- |
+| 2.0 cm | 9.8 N | 8.8 N |
+| **2.5 cm** | **7.8 N** | 7.1 N |
+| 3.0 cm | 6.5 N | 5.9 N |
+| 4.0 cm | 4.9 N | 4.4 N |
+
+So **keep the arm at 2–2.5 cm** to match SwitchBot's force. The earlier ~4 cm
+estimate in this project was too generous. The MG90S is adequate — but only with a
+short arm, which makes the actuation-force measurement the thing that decides
+whether this works at all.
+
+**Two things their spec quietly confirms:**
+
+1. **600 days on a CR2 is ~55 µA average.** No WiFi device reaches that; our
+   light-sleep ESP32 at ~7.5 mA is over 100× worse. This is hard evidence for the
+   Thread/BLE point in `BOM.md` — battery life on WiFi is a physics problem, not a
+   tuning problem.
+2. **At 43 × 37 mm, a SwitchBot cannot fit two adjacent modules on a 22 mm pitch.**
+   The commercial product physically cannot automate this 6-gang board densely.
+   An MG90S body is 22.8 × 12.2 mm, so mounted with the narrow dimension
+   horizontal it *can* sit at ~22 mm pitch. The DIY build can beat the commercial
+   one on density here — which is a genuinely good reason for this project to exist.
 
 ## Phased plan
 
