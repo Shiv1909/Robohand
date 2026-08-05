@@ -39,9 +39,9 @@ servo_h     = 22.5;   // along the output shaft axis; runs horizontally
 /* [Arm] */
 arm_len       = 20;    // hub centre to tip. Print 20 / 25 / 30 and test.
 arm_w         = 8;     // beam width
-arm_t         = 4;     // beam thickness
+arm_t         = 6;     // beam thickness
 hub_d         = 13;    // outer diameter of the arm's hub
-hub_h         = 6.5;   // hub height — must exceed horn_hub_h
+hub_h         = 7;     // hub height — must exceed horn_hub_h
 
 // The arm grips the servo's STOCK plastic horn rather than the spline itself.
 // A 20-tooth spline at ~4.8 mm is below reliable FDM resolution, and a printed
@@ -49,8 +49,15 @@ hub_h         = 6.5;   // hub height — must exceed horn_hub_h
 horn_hub_d    = 7.4;   // round boss at the centre of the stock horn
 horn_hub_h    = 4.2;
 horn_blade_w  = 5.4;   // width of the single-arm blade
-horn_blade_l  = 20;    // how far the blade reaches from centre
 horn_blade_t  = 1.9;   // blade thickness
+
+// How far along the beam the blade slot runs. This only needs to be long enough
+// to stop the arm rotating on the horn — the centre screw does the retaining.
+// Keep it WELL SHORT of arm_len: the slot removes horn_blade_t from the bottom
+// of the beam, and whatever is left above it is the entire load path. At
+// arm_t = 6 and a 1.9 mm slot that leaves 4.1 mm, which is fine. Running the
+// slot the full length of a thin beam would leave a weak channel instead.
+horn_capture_l = 12;
 shaft_screw_d = 2.4;   // the servo's own centre retaining screw
 
 tip_hole_d    = 2.2;   // tether hole at the arm tip
@@ -127,9 +134,10 @@ module fingerbot_arm(len = arm_len) {
         translate([0, 0, -eps])
             cylinder(d = horn_hub_d, h = horn_hub_h);
 
-        // slot for the horn's blade, radially along +X
+        // slot for the horn's blade, radially along +X. Deliberately shorter
+        // than the beam so the top of the beam stays solid — see horn_capture_l.
         translate([0, -horn_blade_w / 2, -eps])
-            cube([horn_blade_l, horn_blade_w, horn_blade_t]);
+            cube([min(horn_capture_l, len), horn_blade_w, horn_blade_t]);
 
         // servo's own centre screw passes right through
         translate([0, 0, -1])

@@ -32,3 +32,12 @@ foreach ($len in $Arms) {
     & $openscad -D 'part="arm"' -D "arm_len=$len" -o (Join-Path $out "arm$len.stl") $src
     "rendered arm$len.stl"
 }
+
+# Preview images, so the design can be eyeballed without opening OpenSCAD.
+$prev = Join-Path $PSScriptRoot "preview"
+if (-not (Test-Path $prev)) { New-Item -ItemType Directory -Force $prev | Out-Null }
+foreach ($p in @("cradle", "arm", "tab")) {
+    & $openscad --autocenter --viewall --imgsize=900,700 --colorscheme=Tomorrow `
+        -D "part=`"$p`"" -o (Join-Path $prev "$p.png") $src
+}
+"rendered preview images"
