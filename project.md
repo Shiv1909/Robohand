@@ -146,6 +146,11 @@ whether this works at all.
   - [x] Firmware written and compiling — `src/phase1c_toggle.cpp`
   - [x] State machine unit-tested — `include/switch_state.h`, 13 tests
   - [ ] Flashed and validated on real hardware
+- [ ] **Phase 1d — Calibration console.** Serial commands to find the three
+      angles without a reflash per guess. A tool, not part of the product.
+  - [x] Firmware written and compiling — `src/phase1d_calibrate.cpp`
+  - [x] Command parser unit-tested — `include/command_parser.h`, 20 tests
+  - [ ] Used against the real switch
 - [ ] ~~**Phase 2 — Wireless trigger.**~~ **SKIPPED.** HomeSpan in Phase 3 subsumes
       it — a native HomeKit accessory already gives phone control *and* Siri from
       the same code, so a standalone web trigger is throwaway work.

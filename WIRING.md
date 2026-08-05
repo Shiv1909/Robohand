@@ -198,3 +198,44 @@ This is where you calibrate the three angles against the real switch. In
 
 **If it turns on when you expected off, swap `ON_ANGLE` and `OFF_ANGLE`.** That's
 the entire fix — the logic doesn't care which direction is which.
+
+---
+
+## Finding those angles the fast way
+
+Don't hand-edit and reflash for every guess. Flash the calibration console once
+and work in the serial monitor:
+
+```
+pio run -e phase1d_calibrate -t upload
+pio device monitor
+```
+
+Same wiring again (the button is simply unused). Then:
+
+| Command | Does |
+| --- | --- |
+| `go <0-180>` | move there, don't store it — use this to hunt |
+| `on` / `off` / `rest <0-180>` | store that angle and move there |
+| `hold <0-5000>` | how long to stay at an angle, ms |
+| `test` | full rest → on → rest → off → rest cycle |
+| `show` | print current values |
+| `save` | persist to flash |
+
+Typical session:
+
+```
+> go 70
+> go 62          <- rocker clicks
+> on 62
+> go 118
+> off 118
+> test
+> save
+```
+
+Values are stored in flash, so a **brownout reset won't lose your work** — which
+matters here, because stalling against a stiff switch is exactly what triggers one.
+
+When `show` gives you numbers you're happy with, paste them into
+`src/phase1c_toggle.cpp` as the new defaults.
