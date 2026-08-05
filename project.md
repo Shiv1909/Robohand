@@ -155,6 +155,9 @@ whether this works at all.
       validated on the real board. See "Why incremental" below.
 - [ ] **Phase 4 — Mechanical body.** Design + 3D-print the arm and a mount sized to
       the actual switchboard; calibrate press angle/depth.
+  - [x] Parametric CAD written and rendering — `cad/fingerbot.scad`
+  - [ ] Test-fitted against the real servo ← **dimensions are from datasheets**
+  - [ ] Arm length chosen against the real switch
 - [ ] **Phase 5 — Permanent.** Battery power, enclosure, mount on the wall.
 - [ ] **Later — Scale.** Add servos 2..N for the other switches on the board.
 
