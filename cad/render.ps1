@@ -68,5 +68,10 @@ Render "cradle" (Join-Path $prev "cradle.png") $view
 Render "arm"    (Join-Path $prev "arm.png")    $view
 Render "tab"    (Join-Path $prev "tab.png")    $view
 
+# Underside view of the arm. Worth keeping reproducible: the horn pocket and
+# blade slot are only visible from below, and looking at this view is what
+# caught the slot running the full length of the beam.
+Render "arm" (Join-Path $prev "arm_underside.png") ($view + @("--camera=0,0,0,120,0,25,90"))
+
 ""
 "Done. STLs in cad\stl\, preview images in cad\preview\"
