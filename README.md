@@ -8,6 +8,9 @@ robotics / embedded project, and aiming to beat the commercial one on a specific
 axis: **density**. A SwitchBot is 43 × 37 mm and physically cannot fit two adjacent
 switches on a 22 mm-pitch Indian modular board. An MG90S can.
 
+**Coming back to this after a break? Start with [STATUS.md](STATUS.md)** — current
+state, what's blocked, what to do next, and every decision already settled.
+
 ## Status
 
 Hardware is on order. Nothing has run on a real board yet.
