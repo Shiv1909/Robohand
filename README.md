@@ -13,15 +13,15 @@ state, what's blocked, what to do next, and every decision already settled.
 
 ## Status
 
-**Working on real hardware.** The servo physically presses — on a timer, and on a
-real pushbutton — with no brownout.
+**Working on real hardware.** The servo physically presses — on a timer, on a real
+pushbutton, and alternating between two angles with state tracking — no brownout.
 
 | Phase | State |
 | --- | --- |
 | 0 — Simulation | ✅ done (Arduino Uno, in Wokwi) |
 | 1 — Servo moves on real hardware | ✅ **validated 2026-08-11** |
 | 1b — Debounced button trigger | ✅ **validated 2026-08-11** — 14 pushes, 14 presses |
-| 1c — Two-position on/off toggle | firmware written + compiling + unit-tested, **not yet flashed** |
+| 1c — Two-position on/off toggle | ✅ **validated 2026-08-11** — strict ON/OFF alternation |
 | 1d — Serial calibration console | firmware written + compiling + unit-tested, **not yet flashed** |
 | 2 — WiFi trigger | ⏭️ skipped — HomeSpan subsumes it |
 | 3 — Siri / Apple Home | deliberately deferred until 1 and 1b are validated on hardware |

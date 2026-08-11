@@ -142,11 +142,13 @@ whether this works at all.
   - [x] Firmware written and compiling — `src/phase1b_button.cpp`
   - [x] Flashed and validated on real hardware — **2026-08-11**, real tactile
         switch on GPIO 4: 14 pushes, 14 presses, no double-fires
-- [ ] **Phase 1c — Two-position toggle.** Separate ON and OFF angles with state
+- [x] **Phase 1c — Two-position toggle.** Separate ON and OFF angles with state
       tracking, because a rocker has two press points. Same wiring as 1b.
   - [x] Firmware written and compiling — `src/phase1c_toggle.cpp`
   - [x] State machine unit-tested — `include/switch_state.h`, 13 tests
-  - [ ] Flashed and validated on real hardware
+  - [x] Flashed and validated on real hardware — **2026-08-11**, 8 presses gave
+        strict ON/OFF/ON/OFF alternation, 0.7 s per move
+  - [ ] Angles calibrated against the real switch ← needs Phase 4 mount + Phase 1d
 - [ ] **Phase 1d — Calibration console.** Serial commands to find the three
       angles without a reflash per guess. A tool, not part of the product.
   - [x] Firmware written and compiling — `src/phase1d_calibrate.cpp`
@@ -169,10 +171,12 @@ whether this works at all.
 
 ## Current status
 
-**Phase 1 and Phase 1b run on real hardware** (2026-08-11).
+**Phases 1, 1b and 1c all run on real hardware** (2026-08-11).
 
-The servo presses on a 3 s timer under `phase1_autopress`, and on a GPIO 4 trigger
-under `phase1b_button`. Serial timing matches the firmware to the tenth of a second
+The servo presses on a 3 s timer under `phase1_autopress`, on a GPIO 4 trigger
+under `phase1b_button`, and alternates between two angles with state tracking under
+`phase1c_toggle` — eight presses gave strict ON/OFF/ON/OFF with no repeats, so
+`include/switch_state.h` behaves on hardware exactly as its 13 tests said. Serial timing matches the firmware to the tenth of a second
 (0.8 s hold, 3.0 s gap), and **the boot banner never reappeared across 22 s of
 continuous pressing** — so the separate 5 V supply and the 1000 µF bulk cap are
 doing their job, and the servo brownout this whole design was built around is not
