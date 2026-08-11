@@ -137,12 +137,11 @@ whether this works at all.
       swinging from firmware over USB.
   - [x] Firmware written and compiling — `src/phase1_autopress.cpp`
   - [x] Flashed and validated on real hardware — **2026-08-11**, no brownout
-- [ ] **Phase 1b — Button trigger.** Pushbutton on a GPIO fires the press instead
+- [x] **Phase 1b — Button trigger.** Pushbutton on a GPIO fires the press instead
       of the auto-loop.
   - [x] Firmware written and compiling — `src/phase1b_button.cpp`
-  - [x] Flashed and validated on real hardware — GPIO 4 trigger and debounce proven
-        by tapping a jumper from pin 4 to GND: 8 taps, 8 presses, no double-fires
-  - [ ] Physical pushbutton seated on a switching pair ← **only item outstanding**
+  - [x] Flashed and validated on real hardware — **2026-08-11**, real tactile
+        switch on GPIO 4: 14 pushes, 14 presses, no double-fires
 - [ ] **Phase 1c — Two-position toggle.** Separate ON and OFF angles with state
       tracking, because a rocker has two press points. Same wiring as 1b.
   - [x] Firmware written and compiling — `src/phase1c_toggle.cpp`
@@ -179,14 +178,16 @@ continuous pressing** — so the separate 5 V supply and the 1000 µF bulk cap a
 doing their job, and the servo brownout this whole design was built around is not
 occurring. That was the project's single biggest unknown and it is now closed.
 
-The only outstanding Phase 1b item is mechanical: the tactile switch needs its legs
-on a switching pair rather than an internally-joined one. The GPIO input itself is
-proven independently by tapping a jumper from pin 4 to GND.
+The debouncer was tested twice — 8 jumper taps, then 14 pushes of the real tactile
+switch — and produced exactly one press per input both times. No two events landed
+closer than 0.9 s apart, and contact bounce settles within single-digit
+milliseconds, so nothing spurious survived. `DEBOUNCE_MS = 50` needs no tuning.
 
-Two things learned that cost real time — both now written up in `WIRING.md`: the
+Three things learned that cost real time — all now written up in `WIRING.md`: the
 ESP32 needs a **CP2102N driver Windows Update does not carry** (no COM port appears
-at all until it's installed), and a 4-pin tactile switch has **only two circuits**,
-so half its leg pairs are permanently closed.
+at all until it's installed); a 4-pin tactile switch has **only two circuits**, so
+half its leg pairs are permanently closed; and the fix for that is to **wire the
+switch diagonally**, which is correct regardless of orientation.
 
 Toolchain: VS Code + PlatformIO Core 6.1.19 + Claude Code. PlatformIO Core is
 installed at `~/.platformio` with `pio` on the user PATH.

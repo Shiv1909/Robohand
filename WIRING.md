@@ -239,17 +239,33 @@ Wire across a joined pair and the pin is grounded permanently. The firmware then
 fires **once** at boot — `Debouncer::update()` returns true only on the edge into
 pressed — and never again, because the release never comes.
 
-**Mount it across the breadboard's centre channel**, so the channel separates the
-pairs for you. The switch is square and goes in two ways; only one is right, and
-they look identical. Verify before wiring:
+**Mount it across the centre channel, then wire it DIAGONALLY.** Take your two
+wires from legs that are diagonally opposite — one from the upper bank, one from
+the lower bank, offset by a row:
 
-- Meter on continuity, probes on `a<row>` and `j<row>`
-- Released → **silent**, pressed → **beep**, released → **silent**
-- **Constant beep** → rotate the switch 90° and retest
+```
+        a b c d e │ f g h i j
+   30   ● ● ● ● ● │ ● ●[■]● ●   ← wire to the − rail
+   31   ● ● ● ●[L]│[L]● ● ● ●   ← switch legs straddle the channel
+   32   ● ● ● ●[L]│[L]● ● ● ●
+   33   ● ●[■]● ● │ ● ● ● ● ●   ← wire to GPIO 4
+```
 
-Or skip the meter and **let the servo be your tester**: wire pin 4 and the `−` rail
-to the two sides and press. Swings on each press = correct. Fires once then dies =
-joined pair, move one wire to the switch's other row.
+Diagonally opposite legs sit on opposite sides of the body, so they are **always**
+one from each joined pair — correct no matter which way the switch went in.
+
+Straight across the same row only works if the switch happens to be oriented the
+right way, and **both orientations look identical from outside**. Going diagonal
+sidesteps the question entirely. Learned the hard way 2026-08-11: straight-across
+gave a permanent closed circuit; the same switch, untouched, worked immediately
+when rewired diagonally.
+
+To check before powering, meter on continuity across your two chosen holes:
+released → **silent**, pressed → **beep**. A constant beep means you still picked a
+joined pair — move one wire to the switch's other row.
+
+Or skip the meter and **let the servo be your tester**: wire it up and press.
+Swings on each press = correct. Fires once at boot then never again = joined pair.
 
 ---
 

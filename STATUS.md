@@ -11,14 +11,14 @@ and not needed.
 
 ## Where we are in one line
 
-**Phase 1 and Phase 1b are validated on real hardware** (2026-08-11) — the servo
-physically presses on a timer, and on a GPIO trigger, with no brownout.
+**Phase 1 and Phase 1b are fully validated on real hardware** (2026-08-11) — the
+servo physically presses on a timer, and on a real pushbutton, with no brownout.
 
 | Phase | State |
 | --- | --- |
 | 0 — Wokwi simulation | ✅ done, on an Arduino Uno |
 | 1 — Servo moves | ✅ **validated on hardware 2026-08-11** |
-| 1b — Debounced button | ✅ **firmware validated on hardware** · physical switch not yet seated |
+| 1b — Debounced button | ✅ **validated on hardware 2026-08-11**, real switch |
 | 1c — Two-position on/off | firmware ✅ · 13 tests ✅ · **not flashed** |
 | 1d — Calibration console | firmware ✅ · 20 tests ✅ · **not flashed** |
 | 2 — WiFi trigger | ⏭️ **skipped** — HomeSpan subsumes it |
@@ -39,22 +39,25 @@ Measured, not assumed:
   sufficient for one MG90S. This was the project's single biggest risk.
 - **Timing is exact.** 0.8 s hold, 3.0 s gap, 3.8 s period — matches
   `phase1_autopress.cpp` to the tenth of a second.
-- **The debouncer works against real bounce.** Eight manual jumper taps on GPIO 4
-  produced exactly eight presses, no double-fires. Tapping a bare wire bounces far
-  worse than a switch, so this is a harder test than the button will ever be.
+- **The debouncer works against real bounce.** Two separate runs: eight jumper taps
+  on GPIO 4 gave eight presses, and fourteen pushes of the real tactile switch gave
+  fourteen presses. **No two events closer than 0.9 s in either run** — contact
+  bounce settles in single-digit milliseconds, so zero double-fires got through.
+  `include/debounce.h` needs no tuning; `DEBOUNCE_MS = 50` is right.
 - **3.3 V PWM drives the MG90S fine.** The logic level converter (item 16919) was
   bought as insurance and is not needed.
+- **Wire tactile switches diagonally.** Straight across a row gave a permanent
+  closed circuit; the same switch worked immediately when rewired diagonally. See
+  `WIRING.md` — this cost an hour.
 
 ---
 
 ## What's actually blocked
 
 1. **Switch measurements not taken.** Blocks final arm length and mount position.
-2. **The physical pushbutton isn't seated right.** Phase 1b firmware is proven via
-   a jumper tap from GPIO 4 to GND. The tactile switch itself still needs its legs
-   on a switching pair rather than a joined pair — see `WIRING.md`. This is a
-   breadboard problem, not a firmware problem.
-3. **Wokwi can't simulate ESP32** here. Dead end — don't retry, see below.
+2. **Wokwi can't simulate ESP32** here. Dead end — don't retry, see below.
+
+Nothing else. Phases 1 and 1b are done on hardware.
 
 ---
 
@@ -62,16 +65,15 @@ Measured, not assumed:
 
 Do these in sequence. Each adds exactly one new thing to debug.
 
-1. **Seat the pushbutton properly** so Phase 1b runs from the switch rather than a
-   jumper tap. Use the servo itself as the tester — see `WIRING.md`.
-2. `pio run -e phase1c_toggle -t upload` → each press alternates on/off.
-3. **Print** one cradle + one `arm20` in **PETG** (`cad/stl/`) — *if* your filament
+1. `pio run -e phase1c_toggle -t upload` → each press alternates on/off. **No
+   wiring change at all** — identical circuit to 1b, purely firmware.
+2. **Print** one cradle + one `arm20` in **PETG** (`cad/stl/`) — *if* your filament
    is PETG. PLA creeps under sustained load and is only good for test-fitting.
-4. Test-fit the cradle and arm against the real servo; correct the parameter
+3. Test-fit the cradle and arm against the real servo; correct the parameter
    block in `cad/fingerbot.scad` and re-run `cad\render.ps1`.
-5. `pio run -e phase1d_calibrate -t upload` → find the three angles by typing,
+4. `pio run -e phase1d_calibrate -t upload` → find the three angles by typing,
    `save`, then paste them into `phase1c_toggle.cpp`.
-6. **Only then** write Phase 3 (HomeSpan).
+5. **Only then** write Phase 3 (HomeSpan).
 
 ---
 
