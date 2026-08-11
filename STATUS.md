@@ -1,24 +1,24 @@
 # STATUS — read this first after a break
 
-Snapshot of the whole project as of **2026-08-07**. Written as a handoff: if you
+Snapshot of the whole project as of **2026-08-11**. Written as a handoff: if you
 (or a fresh Claude session) come back cold, start here.
 
-**Everything is committed and pushed.** 27 commits on `main` at
-<https://github.com/Shiv1909/Robohand>. Nothing lives only on this laptop except
-two untracked screenshots.
+**Everything is committed and pushed** to `main` at
+<https://github.com/Shiv1909/Robohand>. Bench photos on the laptop are untracked
+and not needed.
 
 ---
 
 ## Where we are in one line
 
-All firmware and CAD is written, compiling, and unit-tested — **nothing has ever
-run on real hardware**, because the parts have only just been ordered.
+**Phase 1 and Phase 1b are validated on real hardware** (2026-08-11) — the servo
+physically presses on a timer, and on a GPIO trigger, with no brownout.
 
 | Phase | State |
 | --- | --- |
 | 0 — Wokwi simulation | ✅ done, on an Arduino Uno |
-| 1 — Servo moves | firmware ✅ compiling · **not flashed** |
-| 1b — Debounced button | firmware ✅ · 8 tests ✅ · **not flashed** |
+| 1 — Servo moves | ✅ **validated on hardware 2026-08-11** |
+| 1b — Debounced button | ✅ **firmware validated on hardware** · physical switch not yet seated |
 | 1c — Two-position on/off | firmware ✅ · 13 tests ✅ · **not flashed** |
 | 1d — Calibration console | firmware ✅ · 20 tests ✅ · **not flashed** |
 | 2 — WiFi trigger | ⏭️ **skipped** — HomeSpan subsumes it |
@@ -30,10 +30,30 @@ run on real hardware**, because the parts have only just been ordered.
 
 ---
 
+## What the first hardware session actually proved (2026-08-11)
+
+Measured, not assumed:
+
+- **No brownout.** 22 s of continuous auto-pressing, six cycles, and the boot
+  banner never reappeared. The 5 V 2 A adapter + 1000 µF near the servo is
+  sufficient for one MG90S. This was the project's single biggest risk.
+- **Timing is exact.** 0.8 s hold, 3.0 s gap, 3.8 s period — matches
+  `phase1_autopress.cpp` to the tenth of a second.
+- **The debouncer works against real bounce.** Eight manual jumper taps on GPIO 4
+  produced exactly eight presses, no double-fires. Tapping a bare wire bounces far
+  worse than a switch, so this is a harder test than the button will ever be.
+- **3.3 V PWM drives the MG90S fine.** The logic level converter (item 16919) was
+  bought as insurance and is not needed.
+
+---
+
 ## What's actually blocked
 
-1. **Hardware in transit.** Everything downstream waits on it.
-2. **Switch measurements not taken.** Blocks final arm length and mount position.
+1. **Switch measurements not taken.** Blocks final arm length and mount position.
+2. **The physical pushbutton isn't seated right.** Phase 1b firmware is proven via
+   a jumper tap from GPIO 4 to GND. The tactile switch itself still needs its legs
+   on a switching pair rather than a joined pair — see `WIRING.md`. This is a
+   breadboard problem, not a firmware problem.
 3. **Wokwi can't simulate ESP32** here. Dead end — don't retry, see below.
 
 ---
@@ -42,20 +62,16 @@ run on real hardware**, because the parts have only just been ordered.
 
 Do these in sequence. Each adds exactly one new thing to debug.
 
-1. **Print** one cradle + one `arm20` in **PETG** (`cad/stl/`). Can be done now,
-   *if* your filament is PETG — PLA creeps under sustained load and is only good
-   for test-fitting.
-2. **When the box arrives:** read `WIRING.md` and follow the checklist. **Do not
-   skip step 2** — metering the adapter polarity before connecting anything is
-   what saves the ESP32.
-3. `pio run -e phase1_autopress -t upload` → arm should press every 3 s.
-4. Add the button on GPIO 4 → `pio run -e phase1b_button -t upload`.
-5. `pio run -e phase1c_toggle -t upload` → each press alternates on/off.
-6. Test-fit the cradle and arm against the real servo; correct the parameter
+1. **Seat the pushbutton properly** so Phase 1b runs from the switch rather than a
+   jumper tap. Use the servo itself as the tester — see `WIRING.md`.
+2. `pio run -e phase1c_toggle -t upload` → each press alternates on/off.
+3. **Print** one cradle + one `arm20` in **PETG** (`cad/stl/`) — *if* your filament
+   is PETG. PLA creeps under sustained load and is only good for test-fitting.
+4. Test-fit the cradle and arm against the real servo; correct the parameter
    block in `cad/fingerbot.scad` and re-run `cad\render.ps1`.
-7. `pio run -e phase1d_calibrate -t upload` → find the three angles by typing,
+5. `pio run -e phase1d_calibrate -t upload` → find the three angles by typing,
    `save`, then paste them into `phase1c_toggle.cpp`.
-8. **Only then** write Phase 3 (HomeSpan).
+6. **Only then** write Phase 3 (HomeSpan).
 
 ---
 
@@ -73,6 +89,18 @@ integrated terminal, since it inherits the PATH of whatever launched it.
 | wokwi-cli | 0.26.1 | `%LOCALAPPDATA%\Programs\wokwi-cli`, on User PATH |
 | Node / npm | 24.14.0 / 11.9.0 | |
 | gh | 2.95.0 | authenticated as `Shiv1909` |
+| CP210x VCP driver | Silicon Labs | installed 2026-08-11, `oem186.inf`. **Windows Update does not have it** |
+
+### The ESP32 shows up as COM3
+
+The DevKitC-32E uses a **CP2102N** USB-UART bridge. Windows 11 has no driver for
+it and Windows Update will not find one — Device Manager reports
+`CM_PROB_FAILED_INSTALL` (Code 28) and **no COM port appears at all**, so
+`pio device list` is silently empty. The board is fine; it's just unreachable.
+
+Fixed by installing the Silicon Labs CP210x Universal Windows Driver
+(`silabser.inf`) with `pnputil /add-driver ... /install` from an elevated shell.
+Already done on this machine; only relevant if it's ever rebuilt.
 
 **Build output lives outside this folder** — `workspace_dir` in `platformio.ini`
 sends `.pio` to `%LOCALAPPDATA%\pio-workspace\fingerbot`, because this project

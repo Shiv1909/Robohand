@@ -133,14 +133,16 @@ whether this works at all.
 ## Phased plan
 
 - [x] **Phase 0 — Simulation.** Press logic proven in Wokwi.
-- [ ] **Phase 1 — Real circuit.** ESP32 + servo on a breadboard, servo physically
+- [x] **Phase 1 — Real circuit.** ESP32 + servo on a breadboard, servo physically
       swinging from firmware over USB.
   - [x] Firmware written and compiling — `src/phase1_autopress.cpp`
-  - [ ] Flashed and validated on real hardware ← **blocked: parts in transit**
+  - [x] Flashed and validated on real hardware — **2026-08-11**, no brownout
 - [ ] **Phase 1b — Button trigger.** Pushbutton on a GPIO fires the press instead
       of the auto-loop.
   - [x] Firmware written and compiling — `src/phase1b_button.cpp`
-  - [ ] Flashed and validated on real hardware
+  - [x] Flashed and validated on real hardware — GPIO 4 trigger and debounce proven
+        by tapping a jumper from pin 4 to GND: 8 taps, 8 presses, no double-fires
+  - [ ] Physical pushbutton seated on a switching pair ← **only item outstanding**
 - [ ] **Phase 1c — Two-position toggle.** Separate ON and OFF angles with state
       tracking, because a rocker has two press points. Same wiring as 1b.
   - [x] Firmware written and compiling — `src/phase1c_toggle.cpp`
@@ -168,13 +170,23 @@ whether this works at all.
 
 ## Current status
 
-**Nothing has run on real hardware yet.** Parts are in transit.
+**Phase 1 and Phase 1b run on real hardware** (2026-08-11).
 
-Phase 0 is done in simulation. Phase 1 and Phase 1b firmware are both written and
-**both compile clean for `esp32dev`** (verified 2026-08-02) — but they are unflashed
-and entirely unproven on a physical board. Compiling only proves the code is valid
-C++ and links against the ESP32 Arduino framework; it says nothing about whether the
-servo moves. The first real flash will also be the first real-hardware debug session.
+The servo presses on a 3 s timer under `phase1_autopress`, and on a GPIO 4 trigger
+under `phase1b_button`. Serial timing matches the firmware to the tenth of a second
+(0.8 s hold, 3.0 s gap), and **the boot banner never reappeared across 22 s of
+continuous pressing** — so the separate 5 V supply and the 1000 µF bulk cap are
+doing their job, and the servo brownout this whole design was built around is not
+occurring. That was the project's single biggest unknown and it is now closed.
+
+The only outstanding Phase 1b item is mechanical: the tactile switch needs its legs
+on a switching pair rather than an internally-joined one. The GPIO input itself is
+proven independently by tapping a jumper from pin 4 to GND.
+
+Two things learned that cost real time — both now written up in `WIRING.md`: the
+ESP32 needs a **CP2102N driver Windows Update does not carry** (no COM port appears
+at all until it's installed), and a 4-pin tactile switch has **only two circuits**,
+so half its leg pairs are permanently closed.
 
 Toolchain: VS Code + PlatformIO Core 6.1.19 + Claude Code. PlatformIO Core is
 installed at `~/.platformio` with `pio` on the user PATH.

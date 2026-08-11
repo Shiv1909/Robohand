@@ -13,13 +13,14 @@ state, what's blocked, what to do next, and every decision already settled.
 
 ## Status
 
-Hardware is on order. Nothing has run on a real board yet.
+**Working on real hardware.** The servo physically presses, on a timer and on a
+GPIO trigger, with no brownout.
 
 | Phase | State |
 | --- | --- |
 | 0 — Simulation | ✅ done (Arduino Uno, in Wokwi) |
-| 1 — Servo moves on real hardware | firmware written + compiling, **not yet flashed** |
-| 1b — Debounced button trigger | firmware written + compiling + unit-tested, **not yet flashed** |
+| 1 — Servo moves on real hardware | ✅ **validated 2026-08-11** |
+| 1b — Debounced button trigger | ✅ **firmware validated on hardware**; physical switch not yet seated |
 | 1c — Two-position on/off toggle | firmware written + compiling + unit-tested, **not yet flashed** |
 | 1d — Serial calibration console | firmware written + compiling + unit-tested, **not yet flashed** |
 | 2 — WiFi trigger | ⏭️ skipped — HomeSpan subsumes it |
@@ -89,7 +90,14 @@ Full list in [project.md](project.md). The ones that cost the most time:
 - **Servo brownout.** An MG90S stalling against a stiff switch browns out the ESP32
   through its onboard regulator. The board reboots at exactly the moment the finger
   pushes hardest — it looks like a code bug and isn't. Separate 5 V supply, common
-  ground, bulk capacitor near the servo.
+  ground, bulk capacitor near the servo. *(Verified 2026-08-11: with that wiring,
+  22 s of continuous pressing produced no resets.)*
+- **No COM port at all ≠ nothing on serial.** The DevKitC's CP2102N needs a Silicon
+  Labs driver that Windows Update does not carry. Until it's installed there is no
+  port to select, which reads as a dead board. See `WIRING.md`.
+- **A 4-pin tactile switch has only two circuits.** Half its leg pairs are
+  permanently closed. Mount it across the breadboard channel and verify with a meter
+  before wiring, or the firmware sees a button held down forever.
 - **ESP32Servo needs its PWM timers allocated before `attach()`**, or the servo
   silently never moves.
 - **Rockers need two press points.** Press the top for ON, the bottom for OFF. A

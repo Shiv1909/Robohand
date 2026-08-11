@@ -140,12 +140,43 @@ Work top to bottom. Don't skip step 2 — it's the one that saves the ESP32.
 
 | Symptom | Likely cause | Check |
 | --- | --- | --- |
+| **No COM port exists at all**, `pio device list` empty | **missing CP2102N driver** | see below — this is *not* the same as "nothing on serial" |
 | Nothing on serial | wrong baud / wrong port | monitor is 115200; check the COM port |
 | Serial fine, servo still | missing common ground | step 10 — the most common miss |
 | Serial fine, servo still | 3.3 V signal too weak | fit the level converter |
 | **ESP32 reboots exactly when the arm pushes hardest** | **brownout** | see below |
 | Servo twitches constantly | noisy/insufficient supply | check the 1000 µF is fitted and close to the servo |
 | Servo spins continuously, never holds | **you have the 360° servo** | wrong part — must be the 180° version |
+
+### No COM port at all — the CP2102N driver
+
+**This is different from "nothing on serial", and much more confusing.** There is no
+port to select, no wrong baud rate to fix. `pio device list` prints nothing, the
+upload fails with `Please specify upload_port`, and it looks like a dead board or a
+charge-only cable. It is neither.
+
+The DevKitC-32E talks to the PC through a **CP2102N** USB-UART bridge
+(`VID_10C4 & PID_EA60`). Windows 11 ships no driver for it, and **Windows Update
+will not find one** — "Search automatically for drivers" reports failure. Device
+Manager shows the device under *Other devices* with `CM_PROB_FAILED_INSTALL`
+(Code 28).
+
+Diagnose it in one command — if this returns anything, the board is alive and only
+the driver is missing:
+
+```powershell
+Get-PnpDevice -PresentOnly | Where-Object { $_.FriendlyName -match 'CP210' }
+```
+
+Fix: download the **Silicon Labs CP210x Universal Windows Driver**, then from an
+**elevated** shell:
+
+```powershell
+pnputil /add-driver <path>\silabser.inf /install
+```
+
+The device then moves to *Ports (COM & LPT)* as `Silicon Labs CP210x USB to UART
+Bridge (COMn)`. Done on this machine 2026-08-11; only needed again on a rebuild.
 
 ### The brownout, specifically
 
@@ -168,13 +199,57 @@ itself is the more reliable symptom.
 
 Once Phase 1 works, add the button — **one new thing**:
 
-- [ ] Button leg 1 → GPIO 4, leg 2 → ESP32 GND.
+- [ ] Button leg 1 → GPIO 4, leg 2 → ESP32 GND (the `−` rail *is* ESP32 ground).
 - [ ] `pio run -e phase1b_button -t upload`
 - [ ] Expect `Fingerbot Phase 1b ready.` and no motion until you press.
 
 If the servo stops working at this point, flash `phase1_autopress` again. If that
 still works, the fault is in the button wiring, not the servo — which is exactly why
 the baseline is kept around.
+
+### Test GPIO 4 without a button first
+
+Skip the switch entirely for the first test. Put the **female** end of an M-F jumper
+on pin `4`, and **tap the male end into a `−` rail hole**. That tap *is* a press —
+pin 4 idles HIGH on its internal pull-up, and grounding it is all a button does.
+Perfectly safe: a few microamps through a ~45 kΩ resistor.
+
+This separates "does the firmware work" from "is my switch seated right", which are
+two completely different problems. Tapping a bare wire also bounces far worse than
+any switch, so it's a harder test of the debouncer than the button will ever be —
+8 taps produced exactly 8 presses on 2026-08-11.
+
+> ⚠️ **`−` rail only.** The `+` rail would put 5 V into GPIO 4, and ESP32 pins are
+> 3.3 V logic and **not** 5 V tolerant.
+
+### A 4-pin tactile switch has only TWO circuits
+
+This wastes an evening if you don't know it. The four legs are two **permanently
+joined pairs** — the two legs on the same side of the body are the *same wire*,
+pressed or not. Pressing bridges one pair to the other.
+
+```
+   leg 1 ═══╗                      ╔═══ leg 3
+            ║  ▓▓ METAL A ▓▓       ║  ▓▓ METAL B ▓▓
+   leg 2 ═══╝                      ╚═══ leg 4
+            └──────── gap ─────────┘      pressing closes the gap
+```
+
+Wire across a joined pair and the pin is grounded permanently. The firmware then
+fires **once** at boot — `Debouncer::update()` returns true only on the edge into
+pressed — and never again, because the release never comes.
+
+**Mount it across the breadboard's centre channel**, so the channel separates the
+pairs for you. The switch is square and goes in two ways; only one is right, and
+they look identical. Verify before wiring:
+
+- Meter on continuity, probes on `a<row>` and `j<row>`
+- Released → **silent**, pressed → **beep**, released → **silent**
+- **Constant beep** → rotate the switch 90° and retest
+
+Or skip the meter and **let the servo be your tester**: wire pin 4 and the `−` rail
+to the two sides and press. Swings on each press = correct. Fires once then dies =
+joined pair, move one wire to the switch's other row.
 
 ---
 

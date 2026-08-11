@@ -19,6 +19,32 @@ restart, not just a new integrated terminal. When in doubt use the full path:
 & "$HOME\.platformio\penv\Scripts\pio.exe" --version
 ```
 
+## Serial port — the ESP32 is COM3
+
+The DevKitC-32E's USB bridge is a **CP2102N**, and Windows 11 has no driver for it.
+**Windows Update does not carry one either.** Until the Silicon Labs CP210x driver
+is installed, no COM port exists at all — `pio device list` is silently empty and
+uploads fail with `Please specify upload_port`, which looks exactly like a dead
+board or a charge-only cable.
+
+Installed here 2026-08-11 as `oem186.inf` via `pnputil /add-driver silabser.inf
+/install` from an elevated shell. Full trail in `WIRING.md`. Only relevant if this
+machine is rebuilt.
+
+Reading serial from an agent session: **don't** use `pio device monitor`, it's
+interactive and blocks. Open the port directly instead, and leave DTR/RTS alone
+unless you *want* to reset the board:
+
+```powershell
+$sp = New-Object System.IO.Ports.SerialPort 'COM3',115200,'None',8,'one'
+$sp.DtrEnable = $false; $sp.RtsEnable = $false   # no reset on open
+$sp.Open()
+```
+
+Pulsing `RtsEnable` true→false resets the ESP32, which is how to catch the boot
+banner. Only one process can hold the port — a background monitor will block the
+next `-t upload`.
+
 ## Building
 
 Always pass `-e`. A bare `pio run` builds only `default_envs` (`phase1_autopress`)
