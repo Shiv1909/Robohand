@@ -157,10 +157,14 @@ whether this works at all.
 - [ ] ~~**Phase 2 — Wireless trigger.**~~ **SKIPPED.** HomeSpan in Phase 3 subsumes
       it — a native HomeKit accessory already gives phone control *and* Siri from
       the same code, so a standalone web trigger is throwaway work.
-- [ ] **Phase 3 — Siri / Apple Home.** HomeSpan makes the ESP32 a native HomeKit
+- [x] **Phase 3 — Siri / Apple Home.** HomeSpan makes the ESP32 a native HomeKit
       accessory; "Hey Siri, turn on X" fires the servo.
-      **Not written yet — deliberately held** until Phases 1 and 1b are both
-      validated on the real board. See "Why incremental" below.
+  - [x] Firmware written and compiling — `src/phase3_homekit.cpp`
+  - [x] Paired with Apple Home and driven by Siri on real hardware —
+        **2026-08-11**. The hold until 1/1b were validated worked exactly as
+        intended: WiFi and pairing were the only new variables left to debug.
+  - [x] **Idempotency guard confirmed in the wild** — HomeKit re-sent "turn on"
+        while already ON and the arm correctly did not move
 - [ ] **Phase 4 — Mechanical body.** Design + 3D-print the arm and a mount sized to
       the actual switchboard; calibrate press angle/depth.
   - [x] Parametric CAD written and rendering — `cad/fingerbot.scad`
@@ -171,7 +175,17 @@ whether this works at all.
 
 ## Current status
 
-**Phases 1, 1b and 1c all run on real hardware** (2026-08-11).
+**Siri works.** "Hey Siri, turn on Fingerbot" swings the arm (2026-08-11). Phases 1,
+1b, 1c and 3 are all validated on real hardware, and the firmware side of this
+project is essentially complete. Everything remaining is mechanical: print an arm,
+mount it on the switchboard, calibrate the angles.
+
+The Phase 3 session also produced the project's most satisfying result. Within 100
+seconds of first pairing, HomeKit re-sent "turn on" while the switch was already ON,
+and `SwitchState::requestOn()` returned `Action::None` so the arm did not move. That
+is precisely the failure the class was built to prevent — with a plain bool it would
+have pressed an already-on rocker and turned the light off. Predicted in a header
+comment before any hardware existed; observed on the first try.
 
 The servo presses on a 3 s timer under `phase1_autopress`, on a GPIO 4 trigger
 under `phase1b_button`, and alternates between two angles with state tracking under

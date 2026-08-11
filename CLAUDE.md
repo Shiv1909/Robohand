@@ -56,6 +56,22 @@ pio run -e phase1_autopress -t upload  # compile + flash
 pio run -e phase1b_button   -t upload
 ```
 
+### HomeSpan is pinned to 1.9.x, and must stay that way
+
+HomeSpan 2.x hard-`#error`s unless the arduino-esp32 core is ≥ 3.3.0. This project
+runs `platform = espressif32 @ 7.0.1`, which ships core **2.0.17**. Getting 3.x
+means switching to the pioarduino platform fork — which rebuilds *every*
+environment, including the Phase 1/1b/1c binaries that are validated on hardware.
+
+So `platformio.ini` pins `homespan/HomeSpan@^1.9.1`, and adds it to
+`[env:phase3_homekit]` **only** rather than to `[esp32_base]`. Adding it to the
+shared base would drag the HomeKit + WiFi stack into the baseline builds. With this
+scoping the four Phase 1 binaries stay byte-identical — verified 2026-08-11.
+
+Phase 3 also needs `board_build.partitions = huge_app.csv`; at 1.24 MB it would
+technically squeeze into the default 1.31 MB app partition, but at 94 % full with
+no room to grow.
+
 **Set a short `TEMP` before invoking pio from an agent session:**
 
 ```powershell

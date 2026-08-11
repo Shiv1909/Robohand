@@ -11,9 +11,12 @@ and not needed.
 
 ## Where we are in one line
 
-**Phases 1, 1b and 1c are all validated on real hardware** (2026-08-11) — the servo
-presses on a timer, on a real pushbutton, and alternates between two angles with
-state tracking. No brownout.
+**Siri works.** "Hey Siri, turn on Fingerbot" swings the arm. Phases 1, 1b, 1c and
+**3** are all validated on real hardware (2026-08-11).
+
+The electronics and firmware side of this project is essentially done. What remains
+is mechanical: printing an arm, mounting it, and calibrating the angles against the
+real switchboard.
 
 | Phase | State |
 | --- | --- |
@@ -23,7 +26,7 @@ state tracking. No brownout.
 | 1c — Two-position on/off | ✅ **validated on hardware 2026-08-11** |
 | 1d — Calibration console | firmware ✅ · 20 tests ✅ · **not flashed** |
 | 2 — WiFi trigger | ⏭️ **skipped** — HomeSpan subsumes it |
-| 3 — Siri / HomeSpan | ⛔ **deliberately not started** |
+| 3 — Siri / HomeSpan | ✅ **validated on hardware 2026-08-11** |
 | 4 — Printed parts | CAD ✅ rendering · **not printed, not test-fitted** |
 | 5 — Permanent install | not started |
 
@@ -49,8 +52,17 @@ Measured, not assumed:
   `phase1c_toggle` gave strict ON/OFF/ON/OFF with no repeats, each move taking
   exactly 0.7 s (`HOLD_MS` 500 + 200 ms settle). `include/switch_state.h` behaves on
   hardware as its 13 tests said it would.
+- **The idempotency guard fired for real, within 100 s of the first Siri session.**
+  HomeKit sent "turn on" while the switch was already ON, and `requestOn()` returned
+  `Action::None` so the arm did not move. With a plain bool it would have pressed an
+  already-on rocker and turned the light OFF. This is the single most valuable thing
+  `include/switch_state.h` does, it was predicted in that file's header comment
+  before any hardware existed, and it is now observed rather than theoretical.
 - **3.3 V PWM drives the MG90S fine.** The logic level converter (item 16919) was
   bought as insurance and is not needed.
+- **HomeSpan must be pinned to 1.9.x.** HomeSpan 2.x hard-`#error`s unless the
+  arduino-esp32 core is ≥ 3.3.0, and `platform = espressif32 @ 7.0.1` ships 2.0.17.
+  Pinned in `platformio.ini`, scoped to the Phase 3 env only — see below.
 - **Wire tactile switches diagonally.** Straight across a row gave a permanent
   closed circuit; the same switch worked immediately when rewired diagonally. See
   `WIRING.md` — this cost an hour.
@@ -70,20 +82,25 @@ Nothing else. Phases 1 and 1b are done on hardware.
 
 Do these in sequence. Each adds exactly one new thing to debug.
 
+**Everything left is mechanical.** No firmware is blocked.
+
 1. **Measure the switchboard** — rocker height × width, gang pitch, throw. Needs
-   only a ruler, and it is now the main blocker: it decides arm length and mount
+   only a ruler, and it is the main blocker: it decides arm length and mount
    position for Phase 4.
 2. **Print** one cradle + one `arm20` in **PETG** (`cad/stl/`) — *if* your filament
    is PETG. PLA creeps under sustained load and is only good for test-fitting.
 3. Test-fit the cradle and arm against the real servo; correct the parameter
    block in `cad/fingerbot.scad` and re-run `cad\render.ps1`.
-4. `pio run -e phase1d_calibrate -t upload` → find the three angles by typing,
-   `save`, then paste them into `phase1c_toggle.cpp`. **Do this against the real
-   switch**, so it needs the printed arm and a mount first.
-5. **Only then** write Phase 3 (HomeSpan).
+4. Mount it on the switchboard with the push-pull tether (see `project.md`, "The
+   rocker problem").
+5. `pio run -e phase1d_calibrate -t upload` → find the three angles by typing,
+   `save`, then paste them into **both** `phase1c_toggle.cpp` and
+   `phase3_homekit.cpp`. Needs the printed arm and a real mount first.
+6. Then scale: servos 2..N for the other switches on the board.
 
-The angles currently in `phase1c_toggle.cpp` (REST 90, ON 60, OFF 120) are
-placeholders. They are *not* calibrated against anything — that is step 4's job.
+The angles in `phase1c_toggle.cpp` and `phase3_homekit.cpp` (REST 90, ON 60,
+OFF 120) are placeholders. They are *not* calibrated against anything — step 5's
+job. Both files carry the same three constants; keep them in step.
 
 ---
 
