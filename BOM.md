@@ -357,16 +357,29 @@ constraint.
 
 | Measurement | Value | Confidence |
 | --- | --- | --- |
-| Module width | ~2 cm | plausible — matches the ~22 mm Indian modular standard |
-| Module height | ~7 cm (AR) | **doubtful — see below** |
+| Rocker face width | **20 mm** | AR, 2026-08-11 |
+| Rocker face height | **40 mm** | AR, 2026-08-11 — supersedes the bogus 7 cm |
 | Gang count | 6 | confirmed from photo |
-| Gang pitch | ~2 cm (modules abut) | inferred, needs confirming |
+| Gang pitch | ~23 mm | estimated off the AR photo — **confirm with a ruler** |
 | Mounting space | ample above and below | confirmed from photo |
 
-> **The 7 cm reading looks wrong.** In the photos the rockers are roughly twice as
-> tall as wide (~1 : 2). If width is 2 cm, height should be ~4–4.5 cm — which also
-> matches the standard Indian module (~22 × 45 mm). The AR tape was probably
-> measuring plate edge to plate edge. **Re-measure with a ruler.**
+> **The old 7 cm reading is resolved.** It was measuring the whole faceplate, not
+> one rocker. Re-measured 2026-08-11 as **20 × 40 mm**, which is what the 1 : 2
+> aspect ratio in the photos predicted.
+>
+> This also reconciles with the standard. Indian modular switches are nominally
+> **22 × 45 mm**, but that is the *module including its bezel* — the visible rocker
+> face sits inside it. 20 × 40 mm is exactly right for a 22 × 45 mm module, so two
+> independent sources now agree.
+
+### What 20 × 40 mm means for the design
+
+- **The rocker pivots at its centre**, so each half is **20 × 20 mm**. The adhesive
+  tab goes on the lower half.
+- `cad/fingerbot.scad` sizes the tab at **14 × 10 mm** — comfortably inside a
+  20 × 20 mm half, with margin for misalignment. **No CAD change needed.**
+- At ~23 mm pitch the cradle (28.1 mm wide) still overhangs a single gang, so the
+  staggered above/below mounting for the 6-gang build stands.
 
 ### Actuation force — NOT a blocker
 
@@ -416,8 +429,14 @@ scrub back to the click frame. The video works around scales not holding a peak.
 
 ### Still useful
 
-- [ ] Rocker **height × width** in mm, with a ruler.
-- [ ] **Gang pitch** — centre-to-centre between adjacent modules, mm.
-- [ ] Rocker **throw** — how far the end travels off→on, mm.
-- [ ] How far the plate **protrudes from the wall**, mm.
-- [ ] **Side-on photo** of one switch showing the rocker in both positions.
+- [x] ~~Rocker **height × width**~~ — **20 × 40 mm**, measured 2026-08-11.
+- [ ] **Gang pitch** — centre-to-centre between adjacent modules. Estimated ~23 mm
+      off the AR photo; worth 30 seconds with a ruler to confirm, because it decides
+      how badly the 6-gang build has to stagger.
+- [ ] Rocker **throw** — how far the end travels off→on, mm. **Now the main gap.**
+      Decides the servo sweep angle. Press one side and eyeball the step against a
+      ruler edge; anything from 2–4 mm is typical.
+- [ ] How far the plate **protrudes from the wall**, mm. Sets how far the mount
+      must stand off.
+- [ ] **Side-on photo** of one switch, rocker held in each position. Would give the
+      throw and the protrusion together, from one photo.
