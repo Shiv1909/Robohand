@@ -165,6 +165,10 @@ whether this works at all.
         intended: WiFi and pairing were the only new variables left to debug.
   - [x] **Idempotency guard confirmed in the wild** — HomeKit re-sent "turn on"
         while already ON and the arm correctly did not move
+  - [x] **Physical button works alongside Siri** — 2026-08-11. Both paths share
+        one `SwitchState`, and the button pushes its new state up to HomeKit with
+        `setVal()` so Apple Home never goes stale
+  - [ ] Angles calibrated against the real switch ← needs Phase 4 mount + Phase 1d
 - [ ] **Phase 4 — Mechanical body.** Design + 3D-print the arm and a mount sized to
       the actual switchboard; calibrate press angle/depth.
   - [x] Parametric CAD written and rendering — `cad/fingerbot.scad`

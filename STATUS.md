@@ -58,6 +58,11 @@ Measured, not assumed:
   already-on rocker and turned the light OFF. This is the single most valuable thing
   `include/switch_state.h` does, it was predicted in that file's header comment
   before any hardware existed, and it is now observed rather than theoretical.
+- **Siri and the physical button coexist, sharing one source of truth.** Serial
+  caught the sequence that proves it: HomeKit turned the switch ON, then a button
+  press turned it **OFF** rather than ON — so `toggle()` read the state Siri had
+  set. The button also calls `setVal()` to push its new state up to HomeKit, so
+  Apple Home doesn't go stale and the next Siri command isn't silently swallowed.
 - **3.3 V PWM drives the MG90S fine.** The logic level converter (item 16919) was
   bought as insurance and is not needed.
 - **HomeSpan must be pinned to 1.9.x.** HomeSpan 2.x hard-`#error`s unless the
