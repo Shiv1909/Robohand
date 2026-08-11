@@ -92,10 +92,15 @@ Do these in sequence. Each adds exactly one new thing to debug.
 1. **Measure the switchboard** — rocker height × width, gang pitch, throw. Needs
    only a ruler, and it is the main blocker: it decides arm length and mount
    position for Phase 4.
-2. **Print** one cradle + one `arm20` in **PETG** (`cad/stl/`) — *if* your filament
-   is PETG. PLA creeps under sustained load and is only good for test-fitting.
-3. Test-fit the cradle and arm against the real servo; correct the parameter
-   block in `cad/fingerbot.scad` and re-run `cad\render.ps1`.
+2. **Print `arm20.stl` in PLA.** Smallest, fastest print, and it tests the least
+   certain dimensions in the design — the `horn_*` values are datasheet guesses for
+   the stock plastic horn. If they're wrong the arm won't mount at all, so find out
+   in 15 minutes rather than after an hour on the cradle. Print it flat, as
+   oriented: the bending load then runs *within* the layers rather than across
+   them, and it needs no supports.
+3. Then `cradle.stl` in PLA. Test-fit both against the real servo, correct the
+   parameter block in `cad/fingerbot.scad`, and re-run `cad\render.ps1`.
+   **Reprint the final parts in PETG** once the numbers are right.
 4. Mount it on the switchboard with the push-pull tether (see `project.md`, "The
    rocker problem").
 5. `pio run -e phase1d_calibrate -t upload` → find the three angles by typing,
@@ -183,8 +188,14 @@ Each of these cost real time to work out. Full reasoning is in `project.md`.
 
 ## Open questions for you
 
-- [ ] **Is your red/black filament PETG or PLA?** PLA is fine for test-fitting,
-      not for the permanent build.
+- [x] ~~**Is your filament PETG or PLA?**~~ **Both are available** (2026-08-11).
+      Plan: **PLA for the first test-fit prints, PETG for anything that stays.**
+      The CAD dimensions are datasheet guesses, so print #1 is a measuring tool
+      rather than a part — use the cheap filament and expect to bin it. PLA creeps
+      under sustained load and softens in a warm room, so it cannot hold the arm
+      against a wall for months. Note PETG prints slightly larger than PLA at the
+      same nominal size, so **test-fit the PETG parts too** — the PLA fit does not
+      transfer.
 - [ ] **Rocker dimensions with a ruler.** The AR measurement said 2 × 7 cm, but the
       photos show a ~1:2 ratio, so the height is probably ~4–4.5 cm.
 - [ ] **Gang pitch**, centre-to-centre. Decides how bad the staggering has to be.
